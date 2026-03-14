@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { companiesService } from '../../src/modules/companies/services/companies.service.js';
 import { companiesRepository } from '../../src/modules/companies/repositories/companies.repository.js';
 import { auditService } from '../../src/modules/audit/services/audit.service.js';
@@ -38,5 +39,23 @@ describe('companiesService', () => {
       action: 'company.update',
       changedFields: ['name', 'status']
     }));
+  });
+
+  test('company create normalizes annual revenue before repository writes', async () => {
+    companiesRepository.create = jest.fn().mockResolvedValue({ id: '1', name: 'Acme' });
+    auditService.log = jest.fn().mockResolvedValue(undefined);
+
+    await companiesService.create({
+      tenantId: 'tenant-a',
+      userId: 'user-1',
+      payload: { registrationNo: 'R1', name: 'Acme' }
+    });
+
+    expect(companiesRepository.create).toHaveBeenCalledWith({
+      tenantId: 'tenant-a',
+      registrationNo: 'R1',
+      name: 'Acme',
+      annualRevenue: null
+    });
   });
 });

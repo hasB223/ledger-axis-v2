@@ -1,20 +1,7 @@
 import { AppError } from '../../../shared/errors/app-error.js';
 import { companiesRepository } from '../repositories/companies.repository.js';
 import { auditService } from '../../audit/services/audit.service.js';
-
-const changed = (before, after) => Object.keys(after).filter((k) => before[k] !== after[k]);
-const normalizeCreatePayload = (payload) => ({
-  ...payload,
-  annualRevenue: payload.annualRevenue ?? null
-});
-const normalizeUpdatePayload = (payload) => {
-  const patch = { ...payload };
-  if (Object.prototype.hasOwnProperty.call(patch, 'annualRevenue')) {
-    patch.annual_revenue = patch.annualRevenue;
-    delete patch.annualRevenue;
-  }
-  return patch;
-};
+import { companyDomainService } from '../domain/company-domain.service.js';
 
 export const companiesService = {
   list: ({ tenantId, query }) => companiesRepository.list({ tenantId, ...query }),
@@ -24,21 +11,49 @@ export const companiesService = {
     return company;
   },
   async create({ tenantId, userId, payload }) {
-    const company = await companiesRepository.create({ tenantId, ...normalizeCreatePayload(payload) });
-    await auditService.log({ tenantId, entityType: 'company', entityId: company.id, action: 'company.create', changedFields: Object.keys(payload), actorUserId: userId });
+    const company = await companiesRepository.create({
+      tenantId,
+      ...companyDomainService.normalizeCreatePayload(payload)
+    });
+    await auditService.log(
+      companyDomainService.buildCreateAuditEvent({
+        tenantId,
+        companyId: company.id,
+        actorUserId: userId,
+        payload
+      })
+    );
     return company;
   },
   async update({ tenantId, id, payload, userId }) {
     const before = await companiesRepository.findById({ tenantId, id });
     if (!before) throw new AppError('Company not found', 'NOT_FOUND', 404);
-    const updated = await companiesRepository.update({ tenantId, id, patch: normalizeUpdatePayload(payload) });
-    await auditService.log({ tenantId, entityType: 'company', entityId: id, action: 'company.update', changedFields: changed(before, payload), actorUserId: userId });
+    const updated = await companiesRepository.update({
+      tenantId,
+      id,
+      patch: companyDomainService.normalizeUpdatePayload(payload)
+    });
+    await auditService.log(
+      companyDomainService.buildUpdateAuditEvent({
+        tenantId,
+        companyId: id,
+        actorUserId: userId,
+        before,
+        payload
+      })
+    );
     return updated;
   },
   async remove({ tenantId, id, userId }) {
     const deleted = await companiesRepository.remove({ tenantId, id });
     if (!deleted) throw new AppError('Company not found', 'NOT_FOUND', 404);
-    await auditService.log({ tenantId, entityType: 'company', entityId: id, action: 'company.delete', changedFields: [], actorUserId: userId });
+    await auditService.log(
+      companyDomainService.buildDeleteAuditEvent({
+        tenantId,
+        companyId: id,
+        actorUserId: userId
+      })
+    );
     return { id };
   },
   getDirectorsByCompany: ({ tenantId, companyId }) => companiesRepository.directorsByCompany({ tenantId, companyId })
