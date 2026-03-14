@@ -14,83 +14,8 @@ async function withBackend(task) {
 }
 
 async function ensureSchema(context) {
-  await context.query(`
-    CREATE TABLE IF NOT EXISTS tenants (
-      id BIGSERIAL PRIMARY KEY,
-      name TEXT NOT NULL UNIQUE,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-
-    CREATE TABLE IF NOT EXISTS users (
-      id BIGSERIAL PRIMARY KEY,
-      tenant_id BIGINT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-      email TEXT NOT NULL UNIQUE,
-      full_name TEXT NOT NULL,
-      role TEXT NOT NULL CHECK (role IN ('viewer', 'editor', 'admin')),
-      password_hash TEXT NOT NULL,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-
-    CREATE TABLE IF NOT EXISTS companies (
-      id BIGSERIAL PRIMARY KEY,
-      tenant_id BIGINT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-      registration_no TEXT NOT NULL,
-      name TEXT NOT NULL,
-      industry TEXT,
-      source TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'active',
-      annual_revenue NUMERIC(14, 2),
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE (tenant_id, registration_no)
-    );
-
-    CREATE TABLE IF NOT EXISTS directors (
-      id BIGSERIAL PRIMARY KEY,
-      full_name TEXT NOT NULL,
-      external_ref TEXT UNIQUE,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-
-    CREATE TABLE IF NOT EXISTS company_directors (
-      company_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-      director_id BIGINT NOT NULL REFERENCES directors(id) ON DELETE CASCADE,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (company_id, director_id)
-    );
-
-    CREATE TABLE IF NOT EXISTS watchlist_entries (
-      id BIGSERIAL PRIMARY KEY,
-      tenant_id BIGINT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-      user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      company_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-      note TEXT,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE (tenant_id, user_id, company_id)
-    );
-
-    CREATE TABLE IF NOT EXISTS audit_logs (
-      id BIGSERIAL PRIMARY KEY,
-      tenant_id BIGINT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-      entity_type TEXT NOT NULL,
-      entity_id TEXT NOT NULL,
-      action TEXT NOT NULL,
-      changed_fields TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
-      actor_user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
-      metadata JSONB NOT NULL DEFAULT '{}'::JSONB,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_users_tenant_id ON users (tenant_id);
-    CREATE INDEX IF NOT EXISTS idx_companies_tenant_id ON companies (tenant_id);
-    CREATE INDEX IF NOT EXISTS idx_companies_tenant_registration ON companies (tenant_id, registration_no);
-    CREATE INDEX IF NOT EXISTS idx_company_directors_director_id ON company_directors (director_id);
-    CREATE INDEX IF NOT EXISTS idx_watchlist_entries_lookup ON watchlist_entries (tenant_id, user_id);
-    CREATE INDEX IF NOT EXISTS idx_audit_logs_company_lookup ON audit_logs (tenant_id, entity_type, entity_id, created_at DESC);
-  `);
+  const { runMigrations } = await context.importBackend('src/shared/db/migrate.js');
+  await runMigrations({ direction: 'up', schema: context.env.pg.schema });
 }
 
 async function resetOwnedDataset(context, { tenantNames, directorExternalRefPrefix }) {

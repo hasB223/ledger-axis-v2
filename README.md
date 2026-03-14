@@ -1,123 +1,192 @@
 # LedgerAxis
 
-LedgerAxis is a multi-tenant company due-diligence platform. The repository currently contains a working Node.js/Express backend, a test-oriented Angular 21 frontend slice, backend and frontend Jest coverage, and separate local data setup paths for development, demo, and ingestion verification.
+LedgerAxis is a multi-tenant company due-diligence platform with a Node.js/Express backend, an Angular 21 frontend, PostgreSQL-backed tenant-scoped data access, scheduled ingestion, and focused Jest-based test coverage.
 
 ## Project Overview
 
-The project is organized as a small monorepo:
-
-- `backend/`
-  Express API, PostgreSQL access through `pg`, auth, tenant-scoped data access, analytics, watchlists, audit logs, and ingestion.
-- `frontend/`
-  Angular 21 standalone frontend code focused on maintainable unit tests and behavior coverage.
-- `scripts/`
-  Local data setup and ingestion fixture entrypoints shared by backend development workflows.
+- `backend/`: Express API, JWT auth, role enforcement, tenant-scoped repositories, analytics, watchlists, audit logs, ingestion, Swagger docs, and PostgreSQL migrations.
+- `frontend/`: Angular 21 standalone app, Jest unit tests, route guard/interceptor coverage, and Angular CLI serve/build wiring.
+- `scripts/`: root developer workflow helpers plus separate dev seed, demo seed, and ingestion fixture entrypoints.
 
 ## Architecture Summary
 
-- Backend requests are authenticated with JWT and authorized by role.
-- Tenant isolation is enforced at the repository layer by explicitly passing `tenantId` into repository methods.
-- Company, director, watchlist, analytics, and audit features all read through tenant-scoped queries.
-- Ingestion updates tenant companies through an explicit ingestion service and writes audit entries when fields change.
-- Frontend code uses Angular standalone components, reactive forms, HttpClient wrappers, route guards, an auth interceptor, and Jest-based unit tests.
+- Backend routes authenticate with JWT and authorize by role.
+- Tenant visibility is enforced by passing `tenantId` into repository queries and filtering access in services.
+- PostgreSQL 17 is the single persistence layer and uses the `pg` driver directly.
+- Schema changes are managed with `node-pg-migrate`; seeds and tests apply the same migrations instead of maintaining a second schema definition.
+- The frontend is a standalone Angular 21 app bootstrapped from `src/main.ts`, using Angular router, reactive forms, and `HttpClient`.
+- A scheduler in the backend triggers ingestion on the configured cron expression outside the test environment.
 
 ## Stack Summary
 
 - Runtime: Node.js 24 LTS
-- Backend: Express 4, Joi, JWT, bcrypt, `pg`, node-cron, Swagger UI
-- Frontend: Angular 21, RxJS 7, Chart.js 4, Jest 30, `jest-preset-angular`
-- Database: PostgreSQL 17 assumptions and SQL dialect
-- Testing: Jest and Supertest for backend, Jest + Angular TestBed for frontend
+- Backend: Express 4, Joi, JWT, bcrypt, `pg`, `node-pg-migrate`, node-cron, Swagger UI
+- Frontend: Angular 21, Angular CLI 21, RxJS 7, Chart.js 4
+- Database: PostgreSQL 17
+- Testing: Jest and Supertest for backend, Jest and Angular TestBed for frontend
 
-## Runtime Alignment
+## Runtime and Version Alignment
 
-- Root Node version file: [`.nvmrc`](c:/laragon/www/ledger-axis-v2/.nvmrc) contains `24`
+- Node version file: [`.nvmrc`](c:/laragon/www/ledger-axis-v2/.nvmrc)
+- Root engine: [`package.json`](c:/laragon/www/ledger-axis-v2/package.json)
 - Backend engine: [`backend/package.json`](c:/laragon/www/ledger-axis-v2/backend/package.json)
 - Frontend engine: [`frontend/package.json`](c:/laragon/www/ledger-axis-v2/frontend/package.json)
-- Backend and frontend test scripts both run under Node 24-compatible commands
+- Angular dependencies and CLI are pinned to the Angular 21 line in [`frontend/package.json`](c:/laragon/www/ledger-axis-v2/frontend/package.json) and [`frontend/angular.json`](c:/laragon/www/ledger-axis-v2/frontend/angular.json)
 
 ## Environment Files
 
-Create these files before running the app or seed scripts:
+Copy the backend env template before running migrations, seeds, the API, or ingestion:
 
-1. Root env:
-   - `cp .env.example .env`
-2. Backend env:
-   - `cp backend/.env.example backend/.env`
-3. Frontend env:
-   - `cp frontend/.env.example frontend/.env`
+```bash
+cp backend/.env.example backend/.env
+```
 
-The backend env file is the important one for running the API, tests that hit the API surface, and all local data scripts.
+Optional templates that also exist in the repo:
+
+- [`.env.example`](c:/laragon/www/ledger-axis-v2/.env.example): informational root placeholder
+- [`frontend/.env.example`](c:/laragon/www/ledger-axis-v2/frontend/.env.example): frontend placeholder values, not yet consumed automatically by Angular CLI
+
+Key backend env values:
+
+- `JWT_SECRET`
+- `PGHOST`
+- `PGPORT`
+- `PGDATABASE`
+- `PGUSER`
+- `PGPASSWORD`
+- `PGSSLMODE`
+- `PGSCHEMA`
+- `INGESTION_CRON`
+- `INGESTION_SOURCE_URL`
 
 ## PostgreSQL Setup
 
-LedgerAxis currently expects PostgreSQL-compatible behavior throughout the backend:
+LedgerAxis assumes PostgreSQL 17 semantics throughout the backend:
 
 - `ILIKE` for company search
 - `ON CONFLICT` for upserts
-- `TIMESTAMPTZ` for timestamp columns in local schema bootstrap scripts
+- `TIMESTAMPTZ` for timestamp columns
 - `JSONB` for audit metadata
 
 Recommended local setup:
 
-1. Install PostgreSQL 17 locally.
-2. Create a database, for example `ledgeraxis`.
-3. Set `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`, and `PGSSLMODE` in `backend/.env`.
-4. Set a valid `JWT_SECRET` and a valid `INGESTION_SOURCE_URL`.
-
-The local seed and ingestion fixture scripts bootstrap the minimal schema they need if the tables do not already exist. There is still no formal migration system in the repository.
+1. Install PostgreSQL 17.
+2. Create a database such as `ledgeraxis`.
+3. Create a matching test database such as `ledgeraxis_test`.
+4. Configure [`backend/.env`](c:/laragon/www/ledger-axis-v2/backend/.env.example) with the database connection and `PGSCHEMA=public`.
+5. Run migrations before seeds or the API.
 
 ## Backend Setup
 
-1. `cd backend`
-2. `npm install`
-3. Configure `backend/.env`
-4. Start the API:
-   - `npm run dev`
-   - or `npm start`
+```bash
+cd backend
+npm install
+npm run migrate
+npm run dev
+```
 
-Backend health endpoint:
+Useful backend commands:
 
-- `GET http://localhost:4000/health`
+- `npm start`
+- `npm run migrate`
+- `npm run migrate:down`
+- `npm run migrate:test`
+- `npm run seed:dev`
+- `npm run seed:demo`
+- `npm run ingest:fixture`
+- `npm test`
+- `npm run test:unit`
+- `npm run test:integration`
+- `npm run test:coverage`
 
-API docs:
+Backend URLs:
 
+- Health: `http://localhost:4000/health`
 - Swagger UI: `http://localhost:4000/api/docs`
 - OpenAPI JSON: `http://localhost:4000/api/docs.json`
 
 ## Frontend Setup
 
-1. `cd frontend`
-2. `npm install`
+```bash
+cd frontend
+npm install
+npm start
+```
 
-Current frontend status:
+Useful frontend commands:
 
-- The Angular 21 codebase is present and covered by Jest tests.
-- `npm test` works for frontend validation.
-- `npm start` and `npm run build` intentionally fail with an explicit message because Angular CLI serve/build wiring is not yet implemented in this repository phase.
+- `npm start`
+- `npm run ng -- serve`
+- `npm run ng -- build`
+- `npm run build`
+- `npm test`
+- `npm run test:watch`
+- `npm run test:coverage`
+
+Default frontend URL:
+
+- `http://localhost:4200`
+
+## Root Developer Workflow
+
+Install dependencies in both workspaces first:
+
+```bash
+cd backend && npm install
+cd ../frontend && npm install
+```
+
+Then from the repo root:
+
+```bash
+npm run dev
+```
+
+Root scripts:
+
+- `npm run dev`: starts backend watch mode and Angular dev server together
+- `npm run migrate`: runs backend migrations
+- `npm run migrate:down`: rolls back one backend migration
+- `npm run migrate:test`: validates migrations against a disposable test schema
+- `npm run backend:test`
+- `npm run frontend:test`
+
+## Migration Workflow
+
+Schema management now lives in [`backend/migrations`](c:/laragon/www/ledger-axis-v2/backend/migrations). The first migration replaces the old inline schema bootstrap that had been duplicated inside seed helpers.
+
+How it works:
+
+- `npm run migrate` applies pending migrations to `PGSCHEMA`
+- `npm run migrate:down` rolls back one migration in `PGSCHEMA`
+- `npm run migrate:test` creates a disposable schema, runs the migrations, and drops the schema again
+- backend Jest also creates and drops its own isolated schema automatically
+
+This keeps migrations, seeds, and tests on one schema source of truth.
 
 ## Seed and Fixture Workflows
 
-Three separate local data setup paths are intentionally kept independent.
+These paths stay intentionally separate.
 
-### `seed:dev`
+### Deterministic Dev Seed
 
 Command:
 
-- `cd backend && npm run seed:dev`
+```bash
+cd backend && npm run seed:dev
+```
 
 Purpose:
 
-- deterministic local development
-- fixed tenant and role scenarios
-- stable credentials
-- simple UI and API walkthroughs
+- stable local development
+- predictable tenant and role walkthroughs
+- fixed login credentials
 
-What it creates:
+Creates:
 
 - a few tenants
-- stable users across viewer, editor, and admin roles
-- a small controlled company graph
+- users for each role
+- a controlled company set
 - linked directors
 - watchlists
 - minimal audit entries
@@ -130,141 +199,125 @@ Sample credentials:
 - `admin.bravo@ledgeraxis.local` / `LedgerAxis123!`
 - `viewer.bravo@ledgeraxis.local` / `LedgerAxis123!`
 
-### `seed:demo`
+### Demo Seed
 
 Command:
 
-- `cd backend && npm run seed:demo`
+```bash
+cd backend && npm run seed:demo
+```
 
 Purpose:
 
 - richer manual QA
 - realistic pagination
-- analytics chart data
-- broader tenant/company/director coverage
+- analytics visual checks
+- broader demo coverage
 
-What it creates:
+Creates:
 
-- reproducible faker-backed dataset with a fixed seed
-- many companies and directors
-- mixed `manual` and `ssm_feed` records
-- industry spread
-- director overlap
-- persisted annual revenue bands for analytics
+- reproducible faker-backed companies and directors
+- mixed `manual` and `ssm_feed` company records
+- varied industries
+- revenue spread for analytics
+- overlap between some directors and companies
 
-### `ingest:fixture`
+### Ingestion Fixture
 
 Command:
 
-- `cd backend && npm run ingest:fixture`
+```bash
+cd backend && npm run ingest:fixture
+```
 
 Purpose:
 
-- deterministic ingestion verification
-- sync and re-sync inspection
-- audit verification on changed fields
+- deterministic ingestion testing
+- sync and re-sync verification
+- audit log verification on changed fields
 
-What it uses:
+Source fixtures:
 
-- checked-in fixture payloads in [`backend/src/modules/ingestion/fixtures`](c:/laragon/www/ledger-axis-v2/backend/src/modules/ingestion/fixtures)
-- an isolated fixture tenant
+- [baseline.json](c:/laragon/www/ledger-axis-v2/backend/src/modules/ingestion/fixtures/baseline.json)
+- [resync.json](c:/laragon/www/ledger-axis-v2/backend/src/modules/ingestion/fixtures/resync.json)
 
-Important separation rules:
+Important separation:
 
-- ingestion fixtures do not depend on `seed:dev`
-- ingestion fixtures do not depend on `seed:demo`
-- seed scripts are for local data setup, not for proving ingestion correctness
+- ingestion does not depend on `seed:dev`
+- ingestion does not depend on `seed:demo`
+- seeds are for local data setup, not for proving ingestion correctness
 
 ## Scheduler Behavior
 
-The backend starts a cron job in non-test environments from [`backend/src/server.js`](c:/laragon/www/ledger-axis-v2/backend/src/server.js).
+The backend scheduler is configured in [`backend/src/server.js`](c:/laragon/www/ledger-axis-v2/backend/src/server.js).
 
 - Schedule source: `INGESTION_CRON`
-- Trigger behavior:
-  - scheduler execution calls the ingestion service with `triggeredBy: 'scheduler'`
-  - manual API-triggered ingestion requires an admin role
-
-The scheduler does not run when `NODE_ENV=test`.
+- Runs only when `NODE_ENV !== test`
+- Invokes ingestion with `triggeredBy: 'scheduler'`
+- Manual ingestion remains restricted to admin users through the API
 
 ## Test Commands
 
-### Backend
+Backend:
 
 - `cd backend && npm test`
 - `cd backend && npm run test:unit`
 - `cd backend && npm run test:integration`
 - `cd backend && npm run test:coverage`
 
-### Frontend
+Frontend:
 
 - `cd frontend && npm test`
 - `cd frontend && npm run test:watch`
 - `cd frontend && npm run test:coverage`
 
+Migration validation:
+
+- `cd backend && npm run migrate:test`
+
 ## Local Development Flow
 
-The most understandable local flow today is:
+1. Configure [`backend/.env`](c:/laragon/www/ledger-axis-v2/backend/.env.example).
+2. Install backend and frontend dependencies.
+3. Run `npm run migrate` from the root or `cd backend && npm run migrate`.
+4. Seed the compact dataset with `cd backend && npm run seed:dev`.
+5. Start both apps with `npm run dev`.
+6. Open the frontend at `http://localhost:4200`.
+7. Open Swagger at `http://localhost:4000/api/docs`.
+8. Run backend and frontend tests as needed.
 
-1. Configure `backend/.env` for PostgreSQL and JWT.
-2. Run `cd backend && npm install`.
-3. Run `cd frontend && npm install`.
-4. Seed compact local data with `cd backend && npm run seed:dev`.
-5. Start the backend with `cd backend && npm run dev`.
-6. Inspect API docs at `/api/docs`.
-7. Run backend tests with `cd backend && npm test`.
-8. Run frontend tests with `cd frontend && npm test`.
+Use `seed:demo` when you need pagination and analytics depth. Use `ingest:fixture` when you need deterministic ingestion verification.
 
-For richer datasets:
+## Role and Tenant Rules
 
-- use `seed:demo`
+Role rules:
 
-For ingestion verification:
+- `viewer`: read-only access
+- `editor`: create and update companies, but cannot delete
+- `admin`: full company management and manual ingestion trigger
 
-- use `ingest:fixture`
+Tenant rules:
 
-## API Surface Summary
-
-Main backend route groups:
-
-- `/api/auth`
-- `/api/companies`
-- `/api/directors`
-- `/api/analytics`
-- `/api/watchlist`
-- `/api/ingestion`
-- `/api/companies/:id/audit-log`
-
-Role rules enforced by routes:
-
-- `viewer`
-  - read-only access to companies, directors, analytics, watchlists, and audit logs
-- `editor`
-  - can create and update companies
-  - cannot delete companies
-- `admin`
-  - full company management
-  - can trigger ingestion manually
+- repositories scope company, director, watchlist, analytics, and audit queries by `tenantId`
+- tests and seeds use separate tenants to verify isolation behavior
 
 ## Assumptions and Tradeoffs
 
-- Repository-level `tenantId` enforcement is the primary tenant isolation boundary.
-- PostgreSQL 17 behavior is assumed everywhere in backend SQL and local schema bootstrap.
-- The frontend is intentionally test-first right now; it is not yet wired for a full browser-based local app run.
-- Seed and fixture scripts bootstrap only the minimal schema they need because the repo still lacks a dedicated migration workflow.
-- Swagger coverage is route-driven and aligned to the current implemented routes, not to a future aspirational API.
+- The project stays on Node.js 24, PostgreSQL 17, Angular 21, and the `pg` driver.
+- Migrations are now the schema authority; there is still no ORM.
+- Backend tests create and destroy a dedicated test schema, but most existing integration coverage is still route- and mock-focused rather than database-heavy.
+- Root `npm run dev` assumes backend and frontend dependencies are already installed in their own folders.
 
 ## Known Limitations
 
-- No formal PostgreSQL migration system yet
-- No Docker or compose-based local environment
-- Frontend serve/build workflow is not wired yet
-- Backend seed scripts are production-minded for local use, but not a replacement for migrations or environment provisioning
-- Some backend integration tests still rely on mocks rather than a dedicated test database lifecycle
+- No Docker or compose-based local environment yet
+- No root install/bootstrap script yet
+- Backend integration tests still do not exercise a full seeded PostgreSQL lifecycle
+- Frontend coverage is strong at the unit level, but the app still lacks higher-level browser automation
 
 ## Next Improvements
 
-- Add real database migrations and schema versioning
-- Add a reproducible local PostgreSQL bootstrap flow
-- Wire the Angular app for actual local serve/build
-- Expand Swagger schemas with richer response examples
-- Add DB-backed backend integration tests with isolated reset strategy
+- Add DB-backed backend integration tests that seed per-suite data into the disposable schema
+- Add a root bootstrap command if the team wants one-step dependency install
+- Expand migration coverage with follow-up migrations as the schema evolves
+- Add production build/deploy guidance for backend and frontend separately

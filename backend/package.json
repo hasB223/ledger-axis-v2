@@ -9,6 +9,9 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "migrate": "node ./scripts/migrate.js up",
+    "migrate:down": "node ./scripts/migrate.js down --count=1",
+    "migrate:test": "node ./scripts/migrate-test.js",
     "seed:dev": "node ../scripts/seed-dev.js",
     "seed:demo": "node ../scripts/seed-demo.js",
     "ingest:fixture": "node ../scripts/run-ingestion-fixture.js",
@@ -19,7 +22,7 @@
     "lint": "echo 'TODO: configure eslint'"
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
@@ -37,6 +40,7 @@
   "devDependencies": {
     "@faker-js/faker": "^9.8.0",
     "jest": "^29.7.0",
+    "node-pg-migrate": "^7.9.1",
     "supertest": "^7.0.0"
   }
 }

@@ -7,8 +7,9 @@
     "node": ">=24.0.0 <25"
   },
   "scripts": {
-    "start": "node -e \"console.error('Frontend serve is not wired yet. Use npm test for frontend validation.'); process.exit(1)\"",
-    "build": "node -e \"console.error('Frontend build is not wired yet. Use npm test for frontend validation.'); process.exit(1)\"",
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.config.js --runInBand",
     "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.config.js --watch",
     "test:coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.config.js --coverage --runInBand",
@@ -29,6 +30,8 @@
     "zone.js": "^0.15.0"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^21.0.0",
+    "@angular/cli": "^21.0.0",
     "@angular/compiler-cli": "^21.0.0",
     "@types/jest": "^30.0.0",
     "jest": "^30.0.0",

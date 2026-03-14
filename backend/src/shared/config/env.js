@@ -18,6 +18,7 @@ const schema = Joi.object({
   PGUSER: Joi.string().required(),
   PGPASSWORD: Joi.string().allow('').required(),
   PGSSLMODE: Joi.string().default('disable'),
+  PGSCHEMA: Joi.string().pattern(/^[A-Za-z_][A-Za-z0-9_]*$/).default('public'),
   INGESTION_CRON: Joi.string().default('*/30 * * * *'),
   INGESTION_SOURCE_URL: Joi.string().uri().required()
 }).unknown(true);
@@ -44,6 +45,8 @@ export const env = {
     database: value.PGDATABASE,
     user: value.PGUSER,
     password: value.PGPASSWORD,
+    schema: value.PGSCHEMA,
+    options: `-c search_path=${value.PGSCHEMA},public`,
     ssl: value.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : false
   },
   ingestionCron: value.INGESTION_CRON,
