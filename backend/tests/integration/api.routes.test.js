@@ -3,6 +3,7 @@ import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import { createApp } from '../../src/app.js';
 import { authService } from '../../src/modules/auth/services/auth.service.js';
+import { analyticsService } from '../../src/modules/analytics/services/analytics.service.js';
 import { companiesService } from '../../src/modules/companies/services/companies.service.js';
 import { ingestionService } from '../../src/modules/ingestion/services/ingestion.service.js';
 import { directorsService } from '../../src/modules/directors/services/directors.service.js';
@@ -16,6 +17,7 @@ describe('selected API routes', () => {
   beforeEach(() => {
     app = createApp();
     authService.login = jest.fn().mockResolvedValue({ token: 'jwt', user: { id: 'u1' } });
+    analyticsService.industrySummary = jest.fn().mockResolvedValue([{ industry: 'Technology', count: 3 }]);
     companiesService.list = jest.fn().mockResolvedValue([{ id: 'c1' }]);
     companiesService.create = jest.fn().mockResolvedValue({ id: 'c2' });
     companiesService.update = jest.fn().mockResolvedValue({ id: 'c2' });
@@ -111,6 +113,20 @@ describe('selected API routes', () => {
       source: 'registry',
       sortBy: 'name',
       sortOrder: 'asc'
+    });
+  });
+
+  test('analytics endpoints delegate tenant-scoped context', async () => {
+    const res = await request(app)
+      .get('/api/analytics/industry-summary')
+      .set('Authorization', `Bearer ${token('viewer')}`);
+
+    expect(res.status).toBe(200);
+    expect(analyticsService.industrySummary).toHaveBeenCalledWith({
+      requestId: expect.any(String),
+      tenantId: 't1',
+      userId: 'u1',
+      role: 'viewer'
     });
   });
 

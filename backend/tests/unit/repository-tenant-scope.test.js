@@ -16,4 +16,10 @@ describe('tenant-scoped repository behavior', () => {
     expect(content).toContain('JOIN companies c');
     expect(content).toContain('c.tenant_id=$2');
   });
+
+  test('analytics query services scope reads by tenant context', () => {
+    const content = read('modules/analytics/queries/director-overlap.query.js');
+    expect(content).toContain('WHERE c.tenant_id = $1');
+    expect(content).toContain('[ctx.tenantId]');
+  });
 });

@@ -14,6 +14,7 @@ LedgerAxis is a multi-tenant company due-diligence platform with a Node.js/Expre
 - Tenant visibility is enforced by passing `tenantId` into repository queries and filtering access in services.
 - Backend modules follow `controllers -> application services -> domain services -> repositories` where domain services are only introduced for non-trivial reusable business rules.
 - Request-scoped backend flows build a lightweight context object `{ requestId, userId, tenantId, role }` and pass it through controllers, services, and tenant-aware repositories where it improves consistency and traceability.
+- Analytics reads use dedicated query-service modules so analytical SQL, aggregation, and response mapping stay separate from general application-service orchestration.
 - PostgreSQL 17 is the single persistence layer and uses the `pg` driver directly.
 - Schema changes are managed with `node-pg-migrate`; seeds and tests apply the same migrations instead of maintaining a second schema definition.
 - The frontend is a standalone Angular 21 app bootstrapped from `src/main.ts`, using Angular router, reactive forms, and `HttpClient`.
