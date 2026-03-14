@@ -1,9 +1,9 @@
 import { analyticsRepository } from '../repositories/analytics.repository.js';
 
 export const analyticsService = {
-  industrySummary: ({ tenantId }) => analyticsRepository.industrySummary({ tenantId }),
-  topCompanies: ({ tenantId }) => analyticsRepository.topCompanies({ tenantId }),
-  directorOverlap: ({ tenantId }) => analyticsRepository.directorOverlap({ tenantId }),
-  sourceDistribution: ({ tenantId }) => analyticsRepository.sourceDistribution({ tenantId }),
-  revenueDistribution: ({ tenantId }) => analyticsRepository.revenueDistribution({ tenantId })
+  industrySummary: (ctx) => analyticsRepository.industrySummary(ctx),
+  topCompanies: (ctx) => analyticsRepository.topCompanies(ctx),
+  directorOverlap: (ctx) => analyticsRepository.directorOverlap(ctx),
+  sourceDistribution: (ctx) => analyticsRepository.sourceDistribution(ctx),
+  revenueDistribution: (ctx) => analyticsRepository.revenueDistribution(ctx)
 };

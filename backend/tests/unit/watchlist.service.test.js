@@ -16,11 +16,12 @@ describe('watchlistService', () => {
     companiesRepository.findById = jest.fn().mockResolvedValue({ id: 99 });
     watchlistRepository.findExisting = jest.fn().mockResolvedValue({ id: 1 });
 
-    await expect(watchlistService.create({
-      tenantId: 'tenant-a',
-      userId: 'user-1',
-      payload: { companyId: 99, note: '' }
-    })).rejects.toMatchObject({ code: 'CONFLICT', status: 409 });
+    await expect(
+      watchlistService.create(
+        { requestId: 'req-1', tenantId: 'tenant-a', userId: 'user-1', role: 'viewer' },
+        { payload: { companyId: 99, note: '' } }
+      )
+    ).rejects.toMatchObject({ code: 'CONFLICT', status: 409 });
   });
 
   test('missing company is rejected before insert', async () => {
@@ -28,11 +29,12 @@ describe('watchlistService', () => {
     watchlistRepository.findExisting = jest.fn();
     watchlistRepository.create = jest.fn();
 
-    await expect(watchlistService.create({
-      tenantId: 'tenant-a',
-      userId: 'user-1',
-      payload: { companyId: 99, note: '' }
-    })).rejects.toMatchObject({ code: 'NOT_FOUND', status: 404 });
+    await expect(
+      watchlistService.create(
+        { requestId: 'req-1', tenantId: 'tenant-a', userId: 'user-1', role: 'viewer' },
+        { payload: { companyId: 99, note: '' } }
+      )
+    ).rejects.toMatchObject({ code: 'NOT_FOUND', status: 404 });
 
     expect(watchlistRepository.findExisting).not.toHaveBeenCalled();
     expect(watchlistRepository.create).not.toHaveBeenCalled();
@@ -43,15 +45,16 @@ describe('watchlistService', () => {
     watchlistRepository.findExisting = jest.fn().mockResolvedValue(null);
     watchlistRepository.create = jest.fn().mockResolvedValue({ id: 1, company_id: 99 });
 
-    const result = await watchlistService.create({
-      tenantId: 'tenant-a',
-      userId: 'user-1',
-      payload: { companyId: 99, note: 'Priority' }
-    });
+    const result = await watchlistService.create(
+      { requestId: 'req-1', tenantId: 'tenant-a', userId: 'user-1', role: 'viewer' },
+      { payload: { companyId: 99, note: 'Priority' } }
+    );
 
-    expect(watchlistRepository.create).toHaveBeenCalledWith({
+    expect(watchlistRepository.create).toHaveBeenCalledWith(expect.objectContaining({
+      requestId: 'req-1',
       tenantId: 'tenant-a',
-      userId: 'user-1',
+      userId: 'user-1'
+    }), {
       companyId: 99,
       note: 'Priority'
     });

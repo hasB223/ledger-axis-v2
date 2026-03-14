@@ -1,6 +1,6 @@
 import { auditRepository } from '../repositories/audit.repository.js';
 
 export const auditService = {
-  getCompanyAuditLog: ({ tenantId, companyId }) => auditRepository.getCompanyAuditLog({ tenantId, companyId }),
+  getCompanyAuditLog: (ctx, { companyId }) => auditRepository.getCompanyAuditLog(ctx, { companyId }),
   log: (payload) => auditRepository.createLog(payload)
 };

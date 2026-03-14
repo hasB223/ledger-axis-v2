@@ -99,16 +99,18 @@ describe('selected API routes', () => {
 
     expect(res.status).toBe(200);
     expect(companiesService.list).toHaveBeenCalledWith({
+      requestId: expect.any(String),
       tenantId: 't1',
-      query: {
-        q: 'acme',
-        page: 2,
-        limit: 10,
-        industry: 'Tech',
-        source: 'registry',
-        sortBy: 'name',
-        sortOrder: 'asc'
-      }
+      userId: 'u1',
+      role: 'viewer'
+    }, {
+      q: 'acme',
+      page: 2,
+      limit: 10,
+      industry: 'Tech',
+      source: 'registry',
+      sortBy: 'name',
+      sortOrder: 'asc'
     });
   });
 

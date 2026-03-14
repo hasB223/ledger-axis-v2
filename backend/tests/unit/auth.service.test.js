@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { authService } from '../../src/modules/auth/services/auth.service.js';
 import { authRepository } from '../../src/modules/auth/repositories/auth.repository.js';
 

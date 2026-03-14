@@ -1,11 +1,12 @@
 import { companiesService } from '../services/companies.service.js';
+import { buildRequestContext } from '../../../shared/context/request-context.js';
 import { ok } from '../../../shared/utils/response.js';
 
 export const companiesController = {
-  list: async (req, res, next) => { try { return ok(res, await companiesService.list({ tenantId: req.user.tenantId, query: req.query })); } catch (e) { return next(e); } },
-  getById: async (req, res, next) => { try { return ok(res, await companiesService.getById({ tenantId: req.user.tenantId, id: req.params.id })); } catch (e) { return next(e); } },
-  create: async (req, res, next) => { try { return ok(res, await companiesService.create({ tenantId: req.user.tenantId, userId: req.user.userId, payload: req.body }), 201); } catch (e) { return next(e); } },
-  update: async (req, res, next) => { try { return ok(res, await companiesService.update({ tenantId: req.user.tenantId, id: req.params.id, payload: req.body, userId: req.user.userId })); } catch (e) { return next(e); } },
-  remove: async (req, res, next) => { try { return ok(res, await companiesService.remove({ tenantId: req.user.tenantId, id: req.params.id, userId: req.user.userId })); } catch (e) { return next(e); } },
-  companyDirectors: async (req, res, next) => { try { return ok(res, await companiesService.getDirectorsByCompany({ tenantId: req.user.tenantId, companyId: req.params.id })); } catch (e) { return next(e); } }
+  list: async (req, res, next) => { try { return ok(res, await companiesService.list(buildRequestContext(req), req.query)); } catch (e) { return next(e); } },
+  getById: async (req, res, next) => { try { return ok(res, await companiesService.getById(buildRequestContext(req), { id: req.params.id })); } catch (e) { return next(e); } },
+  create: async (req, res, next) => { try { return ok(res, await companiesService.create(buildRequestContext(req), { payload: req.body }), 201); } catch (e) { return next(e); } },
+  update: async (req, res, next) => { try { return ok(res, await companiesService.update(buildRequestContext(req), { id: req.params.id, payload: req.body })); } catch (e) { return next(e); } },
+  remove: async (req, res, next) => { try { return ok(res, await companiesService.remove(buildRequestContext(req), { id: req.params.id })); } catch (e) { return next(e); } },
+  companyDirectors: async (req, res, next) => { try { return ok(res, await companiesService.getDirectorsByCompany(buildRequestContext(req), { companyId: req.params.id })); } catch (e) { return next(e); } }
 };

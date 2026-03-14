@@ -7,7 +7,8 @@ describe('tenant-scoped repository behavior', () => {
   test('companies repository methods are tenant-aware', () => {
     const content = read('modules/companies/repositories/companies.repository.js');
     expect(content).toContain('tenant_id');
-    expect(content).toContain('findById({ tenantId, id })');
+    expect(content).toContain('findById(ctx, { id })');
+    expect(content).toContain('ctx.tenantId');
   });
 
   test('directors visibility query is scoped by tenant-visible companies', () => {

@@ -1,11 +1,12 @@
 import { env } from '../../../shared/config/env.js';
+import { logger } from '../../../shared/utils/logger.js';
 import { auditService } from '../../audit/services/audit.service.js';
 import { ingestionRepository } from '../repositories/ingestion.repository.js';
 import { ingestionDomainService } from '../domain/ingestion-domain.service.js';
 
 export const ingestionService = {
-  async trigger({ tenantId, userId, triggeredBy, role, dryRun = false }) {
-    if (triggeredBy !== 'scheduler' && role !== 'admin') {
+  async trigger(ctx, { triggeredBy, dryRun = false }) {
+    if (triggeredBy !== 'scheduler' && ctx.role !== 'admin') {
       throw Object.assign(new Error('Forbidden'), { status: 403, code: 'FORBIDDEN' });
     }
 
@@ -19,8 +20,7 @@ export const ingestionService = {
 
     for (const item of companies) {
       const normalizedCompany = ingestionDomainService.normalizeCompany(item);
-      const before = await ingestionRepository.findCompanyByRegistrationNo({
-        tenantId,
+      const before = await ingestionRepository.findCompanyByRegistrationNo(ctx, {
         registrationNo: normalizedCompany.registrationNo
       });
       if (dryRun) continue;
@@ -29,13 +29,10 @@ export const ingestionService = {
         continue;
       }
 
-      const upserted = await ingestionRepository.upsertCompany({
-        tenantId,
-        ...normalizedCompany
-      });
+      const upserted = await ingestionRepository.upsertCompany(ctx, normalizedCompany);
       const auditEvent = ingestionDomainService.buildAuditEvent({
-        tenantId,
-        actorUserId: userId,
+        tenantId: ctx.tenantId,
+        actorUserId: ctx.userId,
         companyId: upserted.id,
         before,
         normalizedCompany,
@@ -48,6 +45,8 @@ export const ingestionService = {
 
       changed += 1;
     }
+
+    logger.info('Ingestion completed', { ...ctx, triggeredBy, processed: companies.length, changed, dryRun });
 
     return { processed: companies.length, changed, dryRun };
   }

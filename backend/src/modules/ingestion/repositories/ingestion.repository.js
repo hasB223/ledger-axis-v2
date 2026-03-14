@@ -1,7 +1,7 @@
 import { query } from '../../../shared/db/pool.js';
 
 export const ingestionRepository = {
-  async upsertCompany({ tenantId, registrationNo, name, industry, source, status, annualRevenue }) {
+  async upsertCompany(ctx, { registrationNo, name, industry, source, status, annualRevenue }) {
     const sql = `INSERT INTO companies (tenant_id, registration_no, name, industry, source, status, annual_revenue, created_at, updated_at)
       VALUES ($1,$2,$3,$4,$5,$6,$7,NOW(),NOW())
       ON CONFLICT (tenant_id, registration_no)
@@ -14,10 +14,10 @@ export const ingestionRepository = {
         source,
         status,
         annual_revenue AS "annualRevenue"`;
-    const { rows } = await query(sql, [tenantId, registrationNo, name, industry || null, source, status, annualRevenue ?? null]);
+    const { rows } = await query(sql, [ctx.tenantId, registrationNo, name, industry || null, source, status, annualRevenue ?? null]);
     return rows[0];
   },
-  async findCompanyByRegistrationNo({ tenantId, registrationNo }) {
+  async findCompanyByRegistrationNo(ctx, { registrationNo }) {
     const { rows } = await query(
       `SELECT id,
         tenant_id AS "tenantId",
@@ -28,7 +28,7 @@ export const ingestionRepository = {
         status,
         annual_revenue AS "annualRevenue"
        FROM companies WHERE tenant_id=$1 AND registration_no=$2`,
-      [tenantId, registrationNo]
+      [ctx.tenantId, registrationNo]
     );
     return rows[0] || null;
   }

@@ -3,16 +3,16 @@ import { companiesRepository } from '../../companies/repositories/companies.repo
 import { watchlistDomainService } from '../domain/watchlist-domain.service.js';
 
 export const watchlistService = {
-  list: ({ tenantId, userId }) => watchlistRepository.list({ tenantId, userId }),
-  async create({ tenantId, userId, payload }) {
-    const company = await companiesRepository.findById({ tenantId, id: payload.companyId });
+  list: (ctx) => watchlistRepository.list(ctx),
+  async create(ctx, { payload }) {
+    const company = await companiesRepository.findById(ctx, { id: payload.companyId });
     watchlistDomainService.ensureCompanyVisible(company);
-    const existing = await watchlistRepository.findExisting({ tenantId, userId, companyId: payload.companyId });
+    const existing = await watchlistRepository.findExisting(ctx, { companyId: payload.companyId });
     watchlistDomainService.ensureEntryAbsent(existing);
-    return watchlistRepository.create({ tenantId, userId, companyId: payload.companyId, note: payload.note });
+    return watchlistRepository.create(ctx, { companyId: payload.companyId, note: payload.note });
   },
-  async remove({ tenantId, userId, id }) {
-    const removed = await watchlistRepository.remove({ tenantId, userId, id });
+  async remove(ctx, { id }) {
+    const removed = await watchlistRepository.remove(ctx, { id });
     watchlistDomainService.ensureEntryRemoved(removed);
     return { id };
   }
