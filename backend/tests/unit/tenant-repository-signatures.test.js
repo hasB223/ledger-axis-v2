@@ -1,6 +1,11 @@
-// TODO: add repository signature tests ensuring tenantId is required where applicable.
-describe('tenant-aware repository signatures', () => {
-  it('placeholder', () => {
-    expect(true).toBe(true);
+import fs from 'node:fs';
+
+const file = fs.readFileSync(new URL('../../src/modules/companies/repositories/companies.repository.js', import.meta.url), 'utf8');
+
+describe('tenant repository signatures', () => {
+  test('repository APIs explicitly include tenantId in method signatures', () => {
+    expect(file).toContain('findById({ tenantId, id })');
+    expect(file).toContain('list({ tenantId, q, page, limit, industry, source, sortBy, sortOrder })');
+    expect(file).not.toContain('findById(id)');
   });
 });

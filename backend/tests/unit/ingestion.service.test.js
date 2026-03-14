@@ -1,0 +1,40 @@
+import { ingestionService } from '../../src/modules/ingestion/services/ingestion.service.js';
+import { ingestionRepository } from '../../src/modules/ingestion/repositories/ingestion.repository.js';
+import { auditService } from '../../src/modules/audit/services/audit.service.js';
+
+const ingestionOriginal = { ...ingestionRepository };
+const auditOriginal = { ...auditService };
+
+beforeEach(() => {
+  global.fetch = jest.fn();
+});
+
+afterEach(() => {
+  Object.assign(ingestionRepository, ingestionOriginal);
+  Object.assign(auditService, auditOriginal);
+  jest.restoreAllMocks();
+});
+
+describe('ingestionService', () => {
+  test('admin can trigger ingestion', async () => {
+    fetch.mockResolvedValue({ ok: true, json: async () => ({ companies: [] }) });
+    const result = await ingestionService.trigger({ tenantId: 't1', userId: 'u1', role: 'admin', triggeredBy: 'manual' });
+    expect(result).toMatchObject({ processed: 0, changed: 0 });
+  });
+
+  test('ingestion re-sync updates changed fields and writes audit logs', async () => {
+    fetch.mockResolvedValue({ ok: true, json: async () => ({ companies: [{ registrationNo: 'R1', name: 'New', industry: 'Tech', source: 'registry', status: 'active' }] }) });
+    ingestionRepository.findCompanyByRegistrationNo = jest.fn().mockResolvedValue({ id: 7, name: 'Old', industry: 'Legacy', source: 'legacy', status: 'inactive' });
+    ingestionRepository.upsertCompany = jest.fn().mockResolvedValue({ id: 7, registration_no: 'R1', name: 'New', industry: 'Tech', source: 'registry', status: 'active' });
+    auditService.log = jest.fn().mockResolvedValue(undefined);
+
+    const result = await ingestionService.trigger({ tenantId: 't1', userId: 'u1', role: 'admin', triggeredBy: 'manual' });
+
+    expect(result.changed).toBe(1);
+    expect(ingestionRepository.upsertCompany).toHaveBeenCalled();
+    expect(auditService.log).toHaveBeenCalledWith(expect.objectContaining({
+      action: 'ingestion.update',
+      changedFields: expect.arrayContaining(['name', 'industry', 'source', 'status'])
+    }));
+  });
+});

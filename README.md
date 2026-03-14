@@ -100,6 +100,14 @@ Tenant isolation is enforced at the **repository layer**:
 3. Start backend placeholder server:
    - `cd ../backend && npm run dev`
 
+### Backend test commands
+
+- `cd backend && npm test`
+- `cd backend && npm run test:unit`
+- `cd backend && npm run test:integration`
+- `cd backend && npm run test:coverage`
+
+Tests are deterministic, do not rely on development seed data, and mock external integrations where required.
 ## Current Phase Scope
 
 This phase intentionally includes only:

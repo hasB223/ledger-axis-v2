@@ -9,7 +9,10 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
+    "test:unit": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand tests/unit",
+    "test:integration": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand tests/integration",
+    "test:coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage --runInBand",
     "lint": "echo 'TODO: configure eslint'"
   },
   "dependencies": {
