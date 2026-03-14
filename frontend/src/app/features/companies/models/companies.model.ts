@@ -1,2 +1,14 @@
-// TODO: companies domain models and API contract interfaces.
-export interface CompaniesModel {}
+export interface Company {
+  id: string;
+  name: string;
+  country: string;
+  status: 'active' | 'inactive';
+  description: string;
+}
+
+export interface CompanyPayload {
+  name: string;
+  country: string;
+  status: 'active' | 'inactive';
+  description: string;
+}

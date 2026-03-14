@@ -108,6 +108,14 @@ Tenant isolation is enforced at the **repository layer**:
 - `cd backend && npm run test:coverage`
 
 Tests are deterministic, do not rely on development seed data, and mock external integrations where required.
+
+### Frontend test commands
+
+- `cd frontend && npm test`
+- `cd frontend && npm run test:watch`
+- `cd frontend && npm run test:coverage`
+
+Frontend tests use Angular 21 standalone component testing with Jest, `TestBed`, `provideHttpClientTesting`, direct guard/interceptor coverage, and deterministic mocks for browser APIs such as storage, `matchMedia`, and Chart.js.
 ## Current Phase Scope
 
 This phase intentionally includes only:

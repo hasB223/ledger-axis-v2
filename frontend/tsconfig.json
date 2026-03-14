@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
+    "lib": ["ES2022", "DOM"],
+    "types": ["jest", "node"],
+    "resolveJsonModule": true,
+    "useDefineForClassFields": false,
+    "baseUrl": ".",
+    "paths": {
+      "@angular/core/testing": ["./node_modules/@angular/core/types/testing.d.ts"],
+      "@angular/common/http": ["./node_modules/@angular/common/types/http.d.ts"],
+      "@angular/common/http/testing": ["./node_modules/@angular/common/types/http-testing.d.ts"]
+    }
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts"]
+}

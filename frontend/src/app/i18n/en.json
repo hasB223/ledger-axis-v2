@@ -1,3 +1,6 @@
 {
-  "TODO": "Add English translations"
+  "auth.invalidCredentials": "Invalid email or password.",
+  "companies.count": "{{count}} companies loaded",
+  "theme.dark": "Dark mode",
+  "theme.light": "Light mode"
 }
