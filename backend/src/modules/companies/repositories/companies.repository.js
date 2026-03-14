@@ -1,6 +1,16 @@
 import { query } from '../../../shared/db/pool.js';
 
 const sortColumns = { name: 'name', created_at: 'created_at', updated_at: 'updated_at' };
+const companySelect = `id,
+  tenant_id AS "tenantId",
+  registration_no AS "registrationNo",
+  name,
+  industry,
+  source,
+  status,
+  annual_revenue AS "annualRevenue",
+  created_at AS "createdAt",
+  updated_at AS "updatedAt"`;
 
 export const companiesRepository = {
   async list({ tenantId, q, page, limit, industry, source, sortBy, sortOrder }) {
@@ -14,27 +24,28 @@ export const companiesRepository = {
     const column = sortColumns[sortBy] || 'updated_at';
     const order = sortOrder === 'asc' ? 'ASC' : 'DESC';
 
-    const sql = `SELECT id, tenant_id, registration_no, name, industry, source, status, created_at, updated_at
+    const sql = `SELECT ${companySelect}
       FROM companies WHERE ${conditions.join(' AND ')}
       ORDER BY ${column} ${order} LIMIT $${params.length - 1} OFFSET $${params.length}`;
     const rows = await query(sql, params);
     return rows.rows;
   },
   async findById({ tenantId, id }) {
-    const { rows } = await query('SELECT * FROM companies WHERE tenant_id = $1 AND id = $2', [tenantId, id]);
+    const { rows } = await query(`SELECT ${companySelect} FROM companies WHERE tenant_id = $1 AND id = $2`, [tenantId, id]);
     return rows[0] || null;
   },
-  async create({ tenantId, registrationNo, name, industry, source, status }) {
-    const sql = `INSERT INTO companies (tenant_id, registration_no, name, industry, source, status, created_at, updated_at)
-      VALUES ($1,$2,$3,$4,$5,$6,NOW(),NOW()) RETURNING *`;
-    const { rows } = await query(sql, [tenantId, registrationNo, name, industry || null, source, status]);
+  async create({ tenantId, registrationNo, name, industry, source, status, annualRevenue }) {
+    const sql = `INSERT INTO companies (tenant_id, registration_no, name, industry, source, status, annual_revenue, created_at, updated_at)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,NOW(),NOW())
+      RETURNING ${companySelect}`;
+    const { rows } = await query(sql, [tenantId, registrationNo, name, industry || null, source, status, annualRevenue ?? null]);
     return rows[0];
   },
   async update({ tenantId, id, patch }) {
     const keys = Object.keys(patch);
     const setSql = keys.map((k, i) => `${k} = $${i + 3}`).join(', ');
     const params = [tenantId, id, ...keys.map((k) => patch[k])];
-    const sql = `UPDATE companies SET ${setSql}, updated_at = NOW() WHERE tenant_id = $1 AND id = $2 RETURNING *`;
+    const sql = `UPDATE companies SET ${setSql}, updated_at = NOW() WHERE tenant_id = $1 AND id = $2 RETURNING ${companySelect}`;
     const { rows } = await query(sql, params);
     return rows[0] || null;
   },

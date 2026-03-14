@@ -15,12 +15,14 @@ export const companyCreateSchema = Joi.object({
   name: Joi.string().required(),
   industry: Joi.string().allow(null, ''),
   source: Joi.string().required(),
-  status: Joi.string().default('active')
+  status: Joi.string().default('active'),
+  annualRevenue: Joi.number().precision(2).min(0)
 });
 
 export const companyUpdateSchema = Joi.object({
   name: Joi.string(),
   industry: Joi.string().allow(null, ''),
   source: Joi.string(),
-  status: Joi.string()
+  status: Joi.string(),
+  annualRevenue: Joi.number().precision(2).min(0)
 }).min(1);

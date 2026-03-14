@@ -3,6 +3,18 @@ import { companiesRepository } from '../repositories/companies.repository.js';
 import { auditService } from '../../audit/services/audit.service.js';
 
 const changed = (before, after) => Object.keys(after).filter((k) => before[k] !== after[k]);
+const normalizeCreatePayload = (payload) => ({
+  ...payload,
+  annualRevenue: payload.annualRevenue ?? null
+});
+const normalizeUpdatePayload = (payload) => {
+  const patch = { ...payload };
+  if (Object.prototype.hasOwnProperty.call(patch, 'annualRevenue')) {
+    patch.annual_revenue = patch.annualRevenue;
+    delete patch.annualRevenue;
+  }
+  return patch;
+};
 
 export const companiesService = {
   list: ({ tenantId, query }) => companiesRepository.list({ tenantId, ...query }),
@@ -12,14 +24,14 @@ export const companiesService = {
     return company;
   },
   async create({ tenantId, userId, payload }) {
-    const company = await companiesRepository.create({ tenantId, ...payload });
+    const company = await companiesRepository.create({ tenantId, ...normalizeCreatePayload(payload) });
     await auditService.log({ tenantId, entityType: 'company', entityId: company.id, action: 'company.create', changedFields: Object.keys(payload), actorUserId: userId });
     return company;
   },
   async update({ tenantId, id, payload, userId }) {
     const before = await companiesRepository.findById({ tenantId, id });
     if (!before) throw new AppError('Company not found', 'NOT_FOUND', 404);
-    const updated = await companiesRepository.update({ tenantId, id, patch: payload });
+    const updated = await companiesRepository.update({ tenantId, id, patch: normalizeUpdatePayload(payload) });
     await auditService.log({ tenantId, entityType: 'company', entityId: id, action: 'company.update', changedFields: changed(before, payload), actorUserId: userId });
     return updated;
   },

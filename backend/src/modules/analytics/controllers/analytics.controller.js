@@ -7,5 +7,6 @@ export const analyticsController = {
   industrySummary: wrap((req) => analyticsService.industrySummary({ tenantId: req.user.tenantId })),
   topCompanies: wrap((req) => analyticsService.topCompanies({ tenantId: req.user.tenantId })),
   directorOverlap: wrap((req) => analyticsService.directorOverlap({ tenantId: req.user.tenantId })),
-  sourceDistribution: wrap((req) => analyticsService.sourceDistribution({ tenantId: req.user.tenantId }))
+  sourceDistribution: wrap((req) => analyticsService.sourceDistribution({ tenantId: req.user.tenantId })),
+  revenueDistribution: wrap((req) => analyticsService.revenueDistribution({ tenantId: req.user.tenantId }))
 };

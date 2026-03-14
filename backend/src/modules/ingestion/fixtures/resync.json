@@ -1,0 +1,28 @@
+{
+  "companies": [
+    {
+      "registrationNo": "ING-1001",
+      "name": "Fixture Holdings Sdn Bhd",
+      "industry": "Financial Technology",
+      "source": "ssm_feed",
+      "status": "inactive",
+      "annualRevenue": 5125000
+    },
+    {
+      "registrationNo": "ING-1002",
+      "name": "Fixture Manufacturing Berhad",
+      "industry": "Manufacturing",
+      "source": "manual",
+      "status": "active",
+      "annualRevenue": 14650000
+    },
+    {
+      "registrationNo": "ING-1003",
+      "name": "Fixture Logistics Group",
+      "industry": "Logistics",
+      "source": "ssm_feed",
+      "status": "active",
+      "annualRevenue": 9850000
+    }
+  ]
+}

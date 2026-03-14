@@ -1,0 +1,20 @@
+{
+  "companies": [
+    {
+      "registrationNo": "ING-1001",
+      "name": "Fixture Holdings Sdn Bhd",
+      "industry": "Technology",
+      "source": "ssm_feed",
+      "status": "active",
+      "annualRevenue": 4250000
+    },
+    {
+      "registrationNo": "ING-1002",
+      "name": "Fixture Manufacturing Berhad",
+      "industry": "Manufacturing",
+      "source": "ssm_feed",
+      "status": "active",
+      "annualRevenue": 13800000
+    }
+  ]
+}

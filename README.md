@@ -106,8 +106,40 @@ Tenant isolation is enforced at the **repository layer**:
 - `cd backend && npm run test:unit`
 - `cd backend && npm run test:integration`
 - `cd backend && npm run test:coverage`
+- `cd backend && npm run seed:dev`
+- `cd backend && npm run seed:demo`
+- `cd backend && npm run ingest:fixture`
 
 Tests are deterministic, do not rely on development seed data, and mock external integrations where required.
+
+### Backend local data setup
+
+LedgerAxis now has three separate local data paths:
+
+- `npm run seed:dev`
+  Creates a compact deterministic dev dataset with fixed tenants, role-based users, a small company/director graph, watchlists, and minimal audit history.
+- `npm run seed:demo`
+  Creates a larger reproducible manual-QA dataset using `@faker-js/faker` with a fixed seed, varied industries, mixed `manual` and `ssm_feed` records, director overlap, pagination depth, and persisted annual revenue for analytics.
+- `npm run ingest:fixture`
+  Runs deterministic ingestion payloads from `backend/src/modules/ingestion/fixtures/` against an isolated fixture tenant so sync/re-sync behavior and audit rows can be inspected without using either seed.
+
+All three commands bootstrap the minimal local PostgreSQL schema they need if it does not exist yet. They are intentionally separate and do not depend on one another.
+
+### Sample dev credentials
+
+`seed:dev` creates these stable local accounts, all using password `LedgerAxis123!`:
+
+- `admin.alpha@ledgeraxis.local`
+- `editor.alpha@ledgeraxis.local`
+- `viewer.alpha@ledgeraxis.local`
+- `admin.bravo@ledgeraxis.local`
+- `viewer.bravo@ledgeraxis.local`
+
+Recommended usage:
+
+1. Configure `backend/.env` with a local PostgreSQL database and backend JWT settings.
+2. Run `cd backend && npm install`.
+3. Run one of the data commands above depending on whether you want compact dev data, richer demo data, or isolated ingestion fixtures.
 
 ### Frontend test commands
 

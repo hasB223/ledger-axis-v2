@@ -25,11 +25,12 @@ export const ingestionService = {
         name: item.name,
         industry: item.industry,
         source: item.source || 'registry',
-        status: item.status || 'active'
+        status: item.status || 'active',
+        annualRevenue: item.annualRevenue ?? null
       });
       const changedFields = before
-        ? ['name', 'industry', 'source', 'status'].filter((field) => before[field] !== upserted[field])
-        : ['name', 'industry', 'source', 'status'];
+        ? ['name', 'industry', 'source', 'status', 'annualRevenue'].filter((field) => before[field] !== upserted[field])
+        : ['name', 'industry', 'source', 'status', 'annualRevenue'];
       if (changedFields.length > 0) {
         await auditService.log({
           tenantId,
@@ -41,7 +42,7 @@ export const ingestionService = {
           metadata: { triggeredBy }
         });
       }
-      results.push({ id: upserted.id, registrationNo: upserted.registration_no });
+      results.push({ id: upserted.id, registrationNo: upserted.registrationNo });
     }
     return { processed: companies.length, changed: results.length, dryRun };
   }
