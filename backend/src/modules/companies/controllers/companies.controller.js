@@ -1,12 +1,11 @@
 import { companiesService } from '../services/companies.service.js';
-import { buildRequestContext } from '../../../shared/context/request-context.js';
-import { ok } from '../../../shared/utils/response.js';
+import { withRequestContext } from '../../../shared/utils/controller.js';
 
 export const companiesController = {
-  list: async (req, res, next) => { try { return ok(res, await companiesService.list(buildRequestContext(req), req.query)); } catch (e) { return next(e); } },
-  getById: async (req, res, next) => { try { return ok(res, await companiesService.getById(buildRequestContext(req), { id: req.params.id })); } catch (e) { return next(e); } },
-  create: async (req, res, next) => { try { return ok(res, await companiesService.create(buildRequestContext(req), { payload: req.body }), 201); } catch (e) { return next(e); } },
-  update: async (req, res, next) => { try { return ok(res, await companiesService.update(buildRequestContext(req), { id: req.params.id, payload: req.body })); } catch (e) { return next(e); } },
-  remove: async (req, res, next) => { try { return ok(res, await companiesService.remove(buildRequestContext(req), { id: req.params.id })); } catch (e) { return next(e); } },
-  companyDirectors: async (req, res, next) => { try { return ok(res, await companiesService.getDirectorsByCompany(buildRequestContext(req), { companyId: req.params.id })); } catch (e) { return next(e); } }
+  list: withRequestContext((ctx, req) => companiesService.list(ctx, req.query)),
+  getById: withRequestContext((ctx, req) => companiesService.getById(ctx, { id: req.params.id })),
+  create: withRequestContext((ctx, req) => companiesService.create(ctx, { payload: req.body }), 201),
+  update: withRequestContext((ctx, req) => companiesService.update(ctx, { id: req.params.id, payload: req.body })),
+  remove: withRequestContext((ctx, req) => companiesService.remove(ctx, { id: req.params.id })),
+  companyDirectors: withRequestContext((ctx, req) => companiesService.getDirectorsByCompany(ctx, { companyId: req.params.id }))
 };

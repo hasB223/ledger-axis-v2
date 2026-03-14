@@ -11,7 +11,7 @@ LedgerAxis is a multi-tenant company due-diligence platform with a Node.js/Expre
 ## Architecture Summary
 
 - Backend routes authenticate with JWT and authorize by role.
-- Tenant visibility is enforced by passing `tenantId` into repository queries and filtering access in services.
+- Tenant visibility is enforced explicitly in tenant-scoped repositories and analytics query services through `tenantId` filters.
 - Backend modules follow `controllers -> application services -> domain services -> repositories` where domain services are only introduced for non-trivial reusable business rules.
 - Request-scoped backend flows build a lightweight context object `{ requestId, userId, tenantId, role }` and pass it through controllers, services, and tenant-aware repositories where it improves consistency and traceability.
 - Analytics reads use dedicated query-service modules so analytical SQL, aggregation, and response mapping stay separate from general application-service orchestration.
@@ -302,7 +302,8 @@ Role rules:
 
 Tenant rules:
 
-- repositories scope company, director, watchlist, analytics, and audit queries by `tenantId`
+- repositories scope company, director, watchlist, and audit queries by `tenantId`
+- analytics query services scope analytical reads by `tenantId`
 - tests and seeds use separate tenants to verify isolation behavior
 
 ## Assumptions and Tradeoffs

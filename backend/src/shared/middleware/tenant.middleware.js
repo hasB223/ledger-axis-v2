@@ -1,3 +1,3 @@
-// TODO: implement tenant header/token extraction for request context only.
-// NOTE: Repository layer must still explicitly accept tenantId for isolation guarantees.
+// Placeholder for future request enrichment only.
+// Repository and query layers must still enforce tenant filtering explicitly.
 export const tenantContextMiddleware = (req, _res, next) => next();
