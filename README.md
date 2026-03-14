@@ -105,6 +105,7 @@ Useful backend commands:
 Backend URLs:
 
 - Health: `http://localhost:4000/health`
+- DB readiness: `http://localhost:4000/health/db`
 - Swagger UI: `http://localhost:4000/api/docs`
 - OpenAPI JSON: `http://localhost:4000/api/docs.json`
 

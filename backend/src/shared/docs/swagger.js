@@ -11,6 +11,7 @@ export const swaggerSpec = swaggerJSDoc({
     },
     tags: [
       { name: 'Auth', description: 'Authentication and current-user endpoints.' },
+      { name: 'Operations', description: 'Operational health and readiness endpoints.' },
       { name: 'Companies', description: 'Tenant-scoped company listing and management.' },
       { name: 'Directors', description: 'Director lookups scoped through tenant-visible companies.' },
       { name: 'Analytics', description: 'Tenant analytics endpoints for charts and summaries.' },
@@ -77,5 +78,5 @@ export const swaggerSpec = swaggerJSDoc({
     },
     servers: [{ url: env.apiPrefix }]
   },
-  apis: ['src/modules/**/routes/*.js']
+  apis: ['src/modules/**/routes/*.js', 'src/app.js']
 });
