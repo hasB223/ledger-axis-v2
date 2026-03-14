@@ -1,12 +1,3 @@
-<<<<<<< ours
-export const watchlistRepository = {
-  health: async () => ({ module: 'watchlist', status: 'ok' }),
-
-  // TODO: enforce strict tenant isolation in all data access methods.
-  // Example signature pattern (required):
-  // findById: async ({ tenantId, id }) => {}
-  // Avoid ambiguous signatures like findById(id).
-=======
 import { query } from '../../../shared/db/pool.js';
 
 export const watchlistRepository = {
@@ -32,5 +23,4 @@ export const watchlistRepository = {
     'DELETE FROM watchlist_entries WHERE tenant_id=$1 AND user_id=$2 AND id=$3',
     [tenantId, userId, id]
   )).rowCount > 0
->>>>>>> theirs
 };

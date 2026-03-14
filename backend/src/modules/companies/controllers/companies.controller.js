@@ -1,16 +1,4 @@
 import { companiesService } from '../services/companies.service.js';
-<<<<<<< ours
-
-export const companiesController = {
-  health: async (req, res, next) => {
-    try {
-      const result = await companiesService.health();
-      res.status(200).json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
-=======
 import { ok } from '../../../shared/utils/response.js';
 
 export const companiesController = {
@@ -20,5 +8,4 @@ export const companiesController = {
   update: async (req, res, next) => { try { return ok(res, await companiesService.update({ tenantId: req.user.tenantId, id: req.params.id, payload: req.body, userId: req.user.userId })); } catch (e) { return next(e); } },
   remove: async (req, res, next) => { try { return ok(res, await companiesService.remove({ tenantId: req.user.tenantId, id: req.params.id, userId: req.user.userId })); } catch (e) { return next(e); } },
   companyDirectors: async (req, res, next) => { try { return ok(res, await companiesService.getDirectorsByCompany({ tenantId: req.user.tenantId, companyId: req.params.id })); } catch (e) { return next(e); } }
->>>>>>> theirs
 };

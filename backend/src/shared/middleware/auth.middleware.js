@@ -1,7 +1,3 @@
-<<<<<<< ours
-// TODO: implement JWT auth middleware and tenant context resolution.
-export const authMiddleware = (req, _res, next) => next();
-=======
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 import { AppError } from '../errors/app-error.js';
@@ -23,4 +19,3 @@ export const authorize = (...roles) => (req, _res, next) => {
   if (!roles.includes(req.user.role)) return next(new AppError('Forbidden', 'FORBIDDEN', 403));
   return next();
 };
->>>>>>> theirs

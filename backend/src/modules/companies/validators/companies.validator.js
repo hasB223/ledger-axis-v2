@@ -1,11 +1,5 @@
 import Joi from 'joi';
 
-<<<<<<< ours
-// TODO: define Joi schemas for companies module requests.
-export const companiesValidator = {
-  placeholder: Joi.object({})
-};
-=======
 export const companyQuerySchema = Joi.object({
   q: Joi.string().allow(''),
   page: Joi.number().integer().min(1).default(1),
@@ -30,4 +24,3 @@ export const companyUpdateSchema = Joi.object({
   source: Joi.string(),
   status: Joi.string()
 }).min(1);
->>>>>>> theirs

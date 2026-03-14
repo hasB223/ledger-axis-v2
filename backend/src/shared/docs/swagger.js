@@ -1,13 +1,3 @@
-<<<<<<< ours
-// TODO: configure swagger-jsdoc and swagger-ui-express for API docs.
-export const swaggerConfig = {
-  openapi: '3.0.3',
-  info: {
-    title: 'LedgerAxis API',
-    version: '0.1.0'
-  }
-};
-=======
 import swaggerJSDoc from 'swagger-jsdoc';
 import { env } from '../config/env.js';
 
@@ -28,4 +18,3 @@ export const swaggerSpec = swaggerJSDoc({
   },
   apis: ['src/modules/**/routes/*.js']
 });
->>>>>>> theirs

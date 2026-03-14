@@ -1,11 +1,3 @@
-<<<<<<< ours
-import { authRepository } from '../repositories/auth.repository.js';
-
-export const authService = {
-  health: async () => {
-    // TODO: replace with real business logic and service orchestration.
-    return authRepository.health();
-=======
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { env } from '../../../shared/config/env.js';
@@ -46,6 +38,5 @@ export const authService = {
     const user = await authRepository.findUserById({ tenantId, userId });
     if (!user) throw new AppError('User not found', 'NOT_FOUND', 404);
     return { id: user.id, tenantId: user.tenant_id, email: user.email, fullName: user.full_name, role: user.role };
->>>>>>> theirs
   }
 };

@@ -1,11 +1,3 @@
-<<<<<<< ours
-import { ingestionRepository } from '../repositories/ingestion.repository.js';
-
-export const ingestionService = {
-  health: async () => {
-    // TODO: replace with real business logic and service orchestration.
-    return ingestionRepository.health();
-=======
 import { env } from '../../../shared/config/env.js';
 import { auditService } from '../../audit/services/audit.service.js';
 import { ingestionRepository } from '../repositories/ingestion.repository.js';
@@ -52,6 +44,5 @@ export const ingestionService = {
       results.push({ id: upserted.id, registrationNo: upserted.registration_no });
     }
     return { processed: companies.length, changed: results.length, dryRun };
->>>>>>> theirs
   }
 };

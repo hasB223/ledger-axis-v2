@@ -1,12 +1,3 @@
-<<<<<<< ours
-export const auditRepository = {
-  health: async () => ({ module: 'audit', status: 'ok' }),
-
-  // TODO: enforce strict tenant isolation in all data access methods.
-  // Example signature pattern (required):
-  // findById: async ({ tenantId, id }) => {}
-  // Avoid ambiguous signatures like findById(id).
-=======
 import { query } from '../../../shared/db/pool.js';
 
 export const auditRepository = {
@@ -23,5 +14,4 @@ export const auditRepository = {
     );
     return rows;
   }
->>>>>>> theirs
 };

@@ -1,12 +1,3 @@
-<<<<<<< ours
-export const analyticsRepository = {
-  health: async () => ({ module: 'analytics', status: 'ok' }),
-
-  // TODO: enforce strict tenant isolation in all data access methods.
-  // Example signature pattern (required):
-  // findById: async ({ tenantId, id }) => {}
-  // Avoid ambiguous signatures like findById(id).
-=======
 import { query } from '../../../shared/db/pool.js';
 
 export const analyticsRepository = {
@@ -18,5 +9,4 @@ export const analyticsRepository = {
     FROM directors d JOIN company_directors cd ON cd.director_id=d.id JOIN companies c ON c.id=cd.company_id
     WHERE c.tenant_id=$1 GROUP BY d.id, d.full_name HAVING COUNT(DISTINCT cd.company_id) > 1 ORDER BY companies_count DESC`, [tenantId])).rows,
   sourceDistribution: async ({ tenantId }) => (await query('SELECT source, COUNT(*)::int AS count FROM companies WHERE tenant_id=$1 GROUP BY source ORDER BY count DESC', [tenantId])).rows
->>>>>>> theirs
 };

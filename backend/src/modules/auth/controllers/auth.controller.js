@@ -1,15 +1,4 @@
 import { authService } from '../services/auth.service.js';
-<<<<<<< ours
-
-export const authController = {
-  health: async (req, res, next) => {
-    try {
-      const result = await authService.health();
-      res.status(200).json(result);
-    } catch (error) {
-      next(error);
-    }
-=======
 import { ok } from '../../../shared/utils/response.js';
 
 export const authController = {
@@ -21,6 +10,5 @@ export const authController = {
   },
   me: async (req, res, next) => {
     try { return ok(res, await authService.me(req.user)); } catch (e) { return next(e); }
->>>>>>> theirs
   }
 };

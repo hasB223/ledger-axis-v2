@@ -1,16 +1,3 @@
-<<<<<<< ours
-import { analyticsService } from '../services/analytics.service.js';
-
-export const analyticsController = {
-  health: async (req, res, next) => {
-    try {
-      const result = await analyticsService.health();
-      res.status(200).json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
-=======
 import { ok } from '../../../shared/utils/response.js';
 import { analyticsService } from '../services/analytics.service.js';
 
@@ -21,5 +8,4 @@ export const analyticsController = {
   topCompanies: wrap((req) => analyticsService.topCompanies({ tenantId: req.user.tenantId })),
   directorOverlap: wrap((req) => analyticsService.directorOverlap({ tenantId: req.user.tenantId })),
   sourceDistribution: wrap((req) => analyticsService.sourceDistribution({ tenantId: req.user.tenantId }))
->>>>>>> theirs
 };

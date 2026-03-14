@@ -1,12 +1,5 @@
 import { Router } from 'express';
 import { authController } from '../controllers/auth.controller.js';
-<<<<<<< ours
-
-export const authRouter = Router();
-
-// TODO: define auth endpoints and attach validators/auth middleware.
-authRouter.get('/health', authController.health);
-=======
 import { registerSchema, loginSchema } from '../validators/auth.validator.js';
 import { validate } from '../../../shared/middleware/validate.middleware.js';
 import { authenticate } from '../../../shared/middleware/auth.middleware.js';
@@ -21,4 +14,3 @@ export const authRouter = Router();
 authRouter.post('/register', validate(registerSchema), authController.register);
 authRouter.post('/login', validate(loginSchema), authController.login);
 authRouter.get('/me', authenticate, authController.me);
->>>>>>> theirs

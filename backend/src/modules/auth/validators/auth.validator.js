@@ -1,11 +1,5 @@
 import Joi from 'joi';
 
-<<<<<<< ours
-// TODO: define Joi schemas for auth module requests.
-export const authValidator = {
-  placeholder: Joi.object({})
-};
-=======
 export const registerSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(8).max(72).required(),
@@ -18,4 +12,3 @@ export const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required()
 });
->>>>>>> theirs

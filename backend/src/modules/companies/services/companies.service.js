@@ -1,12 +1,3 @@
-<<<<<<< ours
-import { companiesRepository } from '../repositories/companies.repository.js';
-
-export const companiesService = {
-  health: async () => {
-    // TODO: replace with real business logic and service orchestration.
-    return companiesRepository.health();
-  }
-=======
 import { AppError } from '../../../shared/errors/app-error.js';
 import { companiesRepository } from '../repositories/companies.repository.js';
 import { auditService } from '../../audit/services/audit.service.js';
@@ -39,5 +30,4 @@ export const companiesService = {
     return { id };
   },
   getDirectorsByCompany: ({ tenantId, companyId }) => companiesRepository.directorsByCompany({ tenantId, companyId })
->>>>>>> theirs
 };

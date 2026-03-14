@@ -1,11 +1,3 @@
-<<<<<<< ours
-import { watchlistRepository } from '../repositories/watchlist.repository.js';
-
-export const watchlistService = {
-  health: async () => {
-    // TODO: replace with real business logic and service orchestration.
-    return watchlistRepository.health();
-=======
 import { AppError } from '../../../shared/errors/app-error.js';
 import { watchlistRepository } from '../repositories/watchlist.repository.js';
 import { companiesRepository } from '../../companies/repositories/companies.repository.js';
@@ -23,6 +15,5 @@ export const watchlistService = {
     const removed = await watchlistRepository.remove({ tenantId, userId, id });
     if (!removed) throw new AppError('Watchlist entry not found', 'NOT_FOUND', 404);
     return { id };
->>>>>>> theirs
   }
 };
