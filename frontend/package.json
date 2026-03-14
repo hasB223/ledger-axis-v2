@@ -7,8 +7,8 @@
     "node": ">=24.0.0 <25"
   },
   "scripts": {
-    "start": "echo 'Angular app scaffolded for unit testing; CLI serve is not wired in this phase.'",
-    "build": "echo 'Angular build is not wired in this phase.'",
+    "start": "node -e \"console.error('Frontend serve is not wired yet. Use npm test for frontend validation.'); process.exit(1)\"",
+    "build": "node -e \"console.error('Frontend build is not wired yet. Use npm test for frontend validation.'); process.exit(1)\"",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.config.js --runInBand",
     "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.config.js --watch",
     "test:coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.config.js --coverage --runInBand",
