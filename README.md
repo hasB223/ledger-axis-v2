@@ -100,6 +100,8 @@ Useful backend commands:
 - `npm test`
 - `npm run test:unit`
 - `npm run test:integration`
+- `npm run test:db`
+- `npm run test:ci`
 - `npm run test:coverage`
 
 Backend URLs:
@@ -152,7 +154,7 @@ Root scripts:
 - `npm run migrate`: runs backend migrations
 - `npm run migrate:down`: rolls back one backend migration
 - `npm run migrate:test`: validates migrations against a disposable test schema
-- `npm run backend:test`
+- `npm run backend:test`: runs backend Jest tests without requiring PostgreSQL
 - `npm run frontend:test`
 
 ## Migration Workflow
@@ -164,9 +166,8 @@ How it works:
 - `npm run migrate` applies pending migrations to `PGSCHEMA`
 - `npm run migrate:down` rolls back one migration in `PGSCHEMA`
 - `npm run migrate:test` creates a disposable schema, runs the migrations, and drops the schema again
-- backend Jest also creates and drops its own isolated schema automatically
 
-This keeps migrations, seeds, and tests on one schema source of truth.
+This keeps migrations, seeds, and DB validation on one schema source of truth.
 
 ## Seed and Fixture Workflows
 
@@ -267,6 +268,8 @@ Backend:
 - `cd backend && npm test`
 - `cd backend && npm run test:unit`
 - `cd backend && npm run test:integration`
+- `cd backend && npm run test:db`
+- `cd backend && npm run test:ci`
 - `cd backend && npm run test:coverage`
 
 Frontend:
@@ -278,6 +281,17 @@ Frontend:
 Migration validation:
 
 - `cd backend && npm run migrate:test`
+
+Backend test database requirements:
+
+- `npm test`, `npm run test:unit`, and `npm run test:integration` do not require PostgreSQL.
+- `npm run migrate:test` and `npm run test:db` do require PostgreSQL connectivity.
+- Test DB config resolves in this order:
+  - `PGTEST*` overrides
+  - fallback `PG*` values
+  - fallback current OS user for `PGUSER` and `${current OS user}_test` for `PGDATABASE`
+- The configured test user must be able to connect to the test database and create/drop the configured test schema.
+- The default disposable test schema is `ledgeraxis_test_suite` unless `PGTESTSCHEMA` is set.
 
 ## Local Development Flow
 
@@ -310,7 +324,7 @@ Tenant rules:
 
 - The project stays on Node.js 24, PostgreSQL 17, Angular 21, and the `pg` driver.
 - Migrations are now the schema authority; there is still no ORM.
-- Backend tests create and destroy a dedicated test schema, but most existing integration coverage is still route- and mock-focused rather than database-heavy.
+- Backend Jest coverage is mostly route- and mock-focused; DB validation is run explicitly through `migrate:test` / `test:db` instead of every Jest run.
 - Root `npm run dev` assumes backend and frontend dependencies are already installed in their own folders.
 
 ## Known Limitations
