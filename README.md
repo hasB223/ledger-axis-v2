@@ -129,6 +129,17 @@ Useful frontend commands:
 - `npm run test:watch`
 - `npm run test:coverage`
 
+Frontend dependency audit note:
+
+- `npm audit` currently reports a high-severity `undici` advisory through Angular build tooling, not through LedgerAxis application code.
+- Current package path: `@angular-devkit/build-angular -> @angular/build -> undici`.
+- LedgerAxis intentionally stays on Angular 21. Do not run `npm audit fix --force` here because npm currently proposes a breaking downgrade to Angular 20 build tooling.
+- Re-check this path before taking action with:
+  - `cd frontend && npm audit`
+  - `cd frontend && npm ls undici @angular/build @angular-devkit/build-angular`
+  - compare the installed Angular 21 build packages with the latest published Angular 21 release
+- See [frontend/DEPENDENCY_RISKS.md](/c:/laragon/www/ledger-axis-v2/frontend/DEPENDENCY_RISKS.md) for the current tracking note.
+
 Default frontend URL:
 
 - `http://localhost:4200`
@@ -166,6 +177,12 @@ How it works:
 - `npm run migrate` applies pending migrations to `PGSCHEMA`
 - `npm run migrate:down` rolls back one migration in `PGSCHEMA`
 - `npm run migrate:test` creates a disposable schema, runs the migrations, and drops the schema again
+
+Tooling note:
+
+- The backend uses `node-pg-migrate` 8.x for schema management.
+- That upgrade was made to remove the previous transitive `glob` audit issue from the older 7.x line.
+- The public migration commands stay the same.
 
 This keeps migrations, seeds, and DB validation on one schema source of truth.
 
@@ -341,6 +358,7 @@ Tenant rules:
 - No root install/bootstrap script yet
 - Backend integration tests still do not exercise a full seeded PostgreSQL lifecycle
 - Frontend coverage is strong at the unit level, but the app still lacks higher-level browser automation
+- Frontend `npm audit` currently includes an unresolved transitive `undici` advisory from Angular build tooling; the repo tracks it until Angular ships a compatible upstream fix
 
 ## Next Improvements
 

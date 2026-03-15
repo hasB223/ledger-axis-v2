@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import migrationRunner from 'node-pg-migrate';
+import { runner as migrationRunner } from 'node-pg-migrate';
 import { env } from '../config/env.js';
 
 const { Pool } = pg;
@@ -12,6 +12,26 @@ const migrationsDir = path.resolve(__dirname, '../../../migrations');
 
 function quoteIdentifier(identifier) {
   return `"${identifier.replace(/"/g, '""')}"`;
+}
+
+function toSchemaList(value) {
+  return Array.isArray(value) ? value : [value];
+}
+
+async function ensureSchemasExist({ schema, migrationsSchema, databaseUrl }) {
+  const pool = new Pool({ connectionString: databaseUrl });
+  const schemaNames = new Set([
+    ...toSchemaList(schema).filter(Boolean),
+    ...toSchemaList(migrationsSchema).filter(Boolean)
+  ]);
+
+  try {
+    for (const schemaName of schemaNames) {
+      await pool.query(`CREATE SCHEMA IF NOT EXISTS ${quoteIdentifier(schemaName)}`);
+    }
+  } finally {
+    await pool.end();
+  }
 }
 
 export function buildDatabaseUrl(pgConfig = env.pg) {
@@ -35,13 +55,21 @@ export async function runMigrations({
   schema = env.pg.schema,
   databaseUrl = buildDatabaseUrl(env.pg)
 } = {}) {
+  const migrationsSchema = Array.isArray(schema) ? schema[0] : schema;
+
+  await ensureSchemasExist({
+    schema,
+    migrationsSchema,
+    databaseUrl
+  });
+
   return migrationRunner({
     databaseUrl,
     dir: migrationsDir,
     direction,
     count,
     schema,
-    migrationsSchema: schema,
+    migrationsSchema,
     migrationsTable: 'pgmigrations',
     createSchema: true,
     noLock: true,
