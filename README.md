@@ -81,6 +81,40 @@ Recommended local setup:
 4. Configure [`backend/.env`](c:/laragon/www/ledger-axis-v2/backend/.env.example) with the database connection and `PGSCHEMA=public`.
 5. Run migrations before seeds or the API.
 
+If you want to use the repo's default local credentials (`PGDATABASE=ledgeraxis`, `PGUSER=ledgeraxis`), you can provision them with `psql` as a PostgreSQL superuser:
+
+```sql
+CREATE ROLE ledgeraxis WITH LOGIN PASSWORD 'your_password';
+CREATE DATABASE ledgeraxis OWNER ledgeraxis;
+GRANT CONNECT, CREATE, TEMPORARY ON DATABASE ledgeraxis TO ledgeraxis;
+```
+
+Then connect to the database and grant schema access:
+
+```sql
+\c ledgeraxis
+GRANT USAGE, CREATE ON SCHEMA public TO ledgeraxis;
+ALTER SCHEMA public OWNER TO ledgeraxis;
+```
+
+After that, set [`backend/.env`](c:/laragon/www/ledger-axis-v2/backend/.env) to match:
+
+```env
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=ledgeraxis
+PGUSER=ledgeraxis
+PGPASSWORD=your_password
+PGSCHEMA=public
+```
+
+Then run:
+
+```bash
+cd backend
+npm run migrate
+```
+
 ## Backend Setup
 
 ```bash

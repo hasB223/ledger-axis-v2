@@ -9,6 +9,7 @@ const { Pool } = pg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const migrationsDir = path.resolve(__dirname, '../../../migrations');
+const TIMESTAMP_WARNING_PREFIX = "Can't determine timestamp for ";
 
 function quoteIdentifier(identifier) {
   return `"${identifier.replace(/"/g, '""')}"`;
@@ -33,6 +34,19 @@ async function ensureSchemasExist({ schema, migrationsSchema, databaseUrl }) {
     await pool.end();
   }
 }
+
+const migrationLogger = {
+  debug: console.debug.bind(console),
+  info: console.info.bind(console),
+  warn: console.warn.bind(console),
+  error(message) {
+    if (typeof message === 'string' && message.startsWith(TIMESTAMP_WARNING_PREFIX)) {
+      return;
+    }
+
+    console.error(message);
+  }
+};
 
 export function buildDatabaseUrl(pgConfig = dbEnv.pg) {
   const databaseUrl = new URL('postgresql://localhost');
@@ -73,7 +87,8 @@ export async function runMigrations({
     migrationsTable: 'pgmigrations',
     createSchema: true,
     noLock: true,
-    singleTransaction: true
+    singleTransaction: true,
+    logger: migrationLogger
   });
 }
 
