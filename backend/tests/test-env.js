@@ -1,6 +1,6 @@
 export const TEST_SCHEMA = 'ledgeraxis_test_suite';
-const currentUser = process.env.USER || process.env.USERNAME || 'postgres';
-const currentDatabase = process.env.PGDATABASE || currentUser;
+const defaultUser = 'postgres';
+const defaultDatabase = 'postgres';
 
 export function applyTestEnvironment() {
   process.env.NODE_ENV = 'test';
@@ -15,8 +15,8 @@ export function applyTestEnvironment() {
   process.env.RATE_LIMIT_MAX = '50';
   process.env.PGHOST = process.env.PGTESTHOST || process.env.PGHOST || 'localhost';
   process.env.PGPORT = process.env.PGTESTPORT || process.env.PGPORT || '5432';
-  process.env.PGDATABASE = process.env.PGTESTDATABASE || process.env.PGDATABASE || `${currentDatabase}_test`;
-  process.env.PGUSER = process.env.PGTESTUSER || process.env.PGUSER || currentUser;
+  process.env.PGDATABASE = process.env.PGTESTDATABASE || process.env.PGDATABASE || defaultDatabase;
+  process.env.PGUSER = process.env.PGTESTUSER || process.env.PGUSER || defaultUser;
   process.env.PGPASSWORD = process.env.PGTESTPASSWORD ?? process.env.PGPASSWORD ?? '';
   process.env.PGSSLMODE = process.env.PGTESTSSLMODE || process.env.PGSSLMODE || 'disable';
   process.env.PGSCHEMA = process.env.PGTESTSCHEMA || process.env.PGSCHEMA || TEST_SCHEMA;

@@ -18,7 +18,7 @@
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
     "test:unit": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand tests/unit",
     "test:integration": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand tests/integration",
-    "test:db": "node ./scripts/migrate-test.js",
+    "test:db": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.db.config.js --runInBand",
     "test:ci": "npm run test:unit && npm run test:integration && npm run test:db",
     "test:coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage --runInBand",
     "lint": "echo 'TODO: configure eslint'"

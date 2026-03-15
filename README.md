@@ -289,9 +289,17 @@ Backend test database requirements:
 - Test DB config resolves in this order:
   - `PGTEST*` overrides
   - fallback `PG*` values
-  - fallback current OS user for `PGUSER` and `${current OS user}_test` for `PGDATABASE`
-- The configured test user must be able to connect to the test database and create/drop the configured test schema.
+  - fallback `postgres` for both `PGUSER` and `PGDATABASE`
+- By default, the DB-backed suite reuses the configured PostgreSQL database and isolates itself with a disposable schema instead of requiring a separate `*_test` database.
+- Set `PGTESTDATABASE` if you want to point the DB-backed suite at a dedicated test database instead.
+- The configured test user must be able to connect to the resolved database and create/drop the configured test schema.
 - The default disposable test schema is `ledgeraxis_test_suite` unless `PGTESTSCHEMA` is set.
+
+DB-backed integration coverage:
+
+- `cd backend && npm run test:db`
+- This suite applies migrations into the disposable test schema, runs a small set of real PostgreSQL-backed integration tests, and then drops the schema in teardown.
+- It currently validates migration application, tenant-scoped repository behavior, watchlist uniqueness, ingestion upsert behavior with `ON CONFLICT`, and an analytics aggregation query against real seeded rows.
 
 ## Local Development Flow
 
