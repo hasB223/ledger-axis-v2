@@ -1,5 +1,5 @@
 import swaggerJSDoc from 'swagger-jsdoc';
-import { env } from '../config/env.js';
+import { appEnv } from '../config/app-env.js';
 
 export const swaggerSpec = swaggerJSDoc({
   definition: {
@@ -76,7 +76,7 @@ export const swaggerSpec = swaggerJSDoc({
         bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }
       }
     },
-    servers: [{ url: env.apiPrefix }]
+    servers: [{ url: appEnv.apiPrefix }]
   },
   apis: ['src/modules/**/routes/*.js', 'src/app.js']
 });

@@ -2,7 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { runner as migrationRunner } from 'node-pg-migrate';
-import { env } from '../config/env.js';
+import { dbEnv } from '../config/db-env.js';
 
 const { Pool } = pg;
 
@@ -34,7 +34,7 @@ async function ensureSchemasExist({ schema, migrationsSchema, databaseUrl }) {
   }
 }
 
-export function buildDatabaseUrl(pgConfig = env.pg) {
+export function buildDatabaseUrl(pgConfig = dbEnv.pg) {
   const databaseUrl = new URL('postgresql://localhost');
   databaseUrl.username = pgConfig.user;
   databaseUrl.password = pgConfig.password;
@@ -52,8 +52,8 @@ export function buildDatabaseUrl(pgConfig = env.pg) {
 export async function runMigrations({
   direction = 'up',
   count,
-  schema = env.pg.schema,
-  databaseUrl = buildDatabaseUrl(env.pg)
+  schema = dbEnv.pg.schema,
+  databaseUrl = buildDatabaseUrl(dbEnv.pg)
 } = {}) {
   const migrationsSchema = Array.isArray(schema) ? schema[0] : schema;
 
@@ -77,7 +77,7 @@ export async function runMigrations({
   });
 }
 
-export async function dropSchema({ schema = env.pg.schema, databaseUrl = buildDatabaseUrl(env.pg) } = {}) {
+export async function dropSchema({ schema = dbEnv.pg.schema, databaseUrl = buildDatabaseUrl(dbEnv.pg) } = {}) {
   const pool = new Pool({ connectionString: databaseUrl });
 
   try {

@@ -12,15 +12,15 @@ requireFromBackend('dotenv').config({ path: path.join(backendRoot, '.env') });
 const importBackend = (relativePath) => import(pathToFileURL(path.join(backendRoot, relativePath)).href);
 
 async function getBackendContext() {
-  const [{ env }, { pool, query }] = await Promise.all([
-    importBackend('src/shared/config/env.js'),
+  const [{ dbEnv }, { pool, query }] = await Promise.all([
+    importBackend('src/shared/config/db-env.js'),
     importBackend('src/shared/db/pool.js')
   ]);
 
   return {
     repoRoot,
     backendRoot,
-    env,
+    env: dbEnv,
     pool,
     query,
     requireFromBackend,

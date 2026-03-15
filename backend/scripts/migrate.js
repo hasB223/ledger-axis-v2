@@ -1,4 +1,4 @@
-import { env } from '../src/shared/config/env.js';
+import { dbEnv } from '../src/shared/config/db-env.js';
 import { runMigrations } from '../src/shared/db/migrate.js';
 
 const args = process.argv.slice(2);
@@ -9,5 +9,5 @@ const count = countArg ? Number(countArg.split('=')[1]) : undefined;
 await runMigrations({
   direction,
   count,
-  schema: env.pg.schema
+  schema: dbEnv.pg.schema
 });

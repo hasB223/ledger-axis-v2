@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { env } from '../../../shared/config/env.js';
+import { appEnv } from '../../../shared/config/app-env.js';
 import { AppError } from '../../../shared/errors/app-error.js';
 import { authRepository } from '../repositories/auth.repository.js';
 
-const signToken = (user) => jwt.sign({ userId: user.id, tenantId: user.tenant_id, role: user.role }, env.jwtSecret, { expiresIn: env.jwtExpiresIn });
+const signToken = (user) => jwt.sign({ userId: user.id, tenantId: user.tenant_id, role: user.role }, appEnv.jwtSecret, { expiresIn: appEnv.jwtExpiresIn });
 
 export const authService = {
   async register(payload) {
@@ -12,7 +12,7 @@ export const authService = {
     if (existing) throw new AppError('Email already registered', 'CONFLICT', 409);
 
     const tenant = await authRepository.createTenant({ tenantName: payload.tenantName });
-    const passwordHash = await bcrypt.hash(payload.password, env.bcryptSaltRounds);
+    const passwordHash = await bcrypt.hash(payload.password, appEnv.bcryptSaltRounds);
     const user = await authRepository.createUser({
       tenantId: tenant.id,
       email: payload.email,

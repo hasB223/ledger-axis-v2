@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken';
-import { env } from '../config/env.js';
+import { appEnv } from '../config/app-env.js';
 import { AppError } from '../errors/app-error.js';
 
 export const authenticate = (req, _res, next) => {
   const auth = req.headers.authorization;
   if (!auth?.startsWith('Bearer ')) return next(new AppError('Missing bearer token', 'UNAUTHORIZED', 401));
   try {
-    const payload = jwt.verify(auth.slice(7), env.jwtSecret);
+    const payload = jwt.verify(auth.slice(7), appEnv.jwtSecret);
     req.user = { userId: payload.userId, tenantId: payload.tenantId, role: payload.role };
     return next();
   } catch {

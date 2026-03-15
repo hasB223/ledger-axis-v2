@@ -51,16 +51,18 @@ Optional templates that also exist in the repo:
 
 Key backend env values:
 
+- DB-only commands:
+  - `PGHOST`
+  - `PGPORT`
+  - `PGDATABASE`
+  - `PGUSER`
+  - `PGPASSWORD`
+  - `PGSSLMODE`
+  - `PGSCHEMA`
+- Full API runtime:
 - `JWT_SECRET`
-- `PGHOST`
-- `PGPORT`
-- `PGDATABASE`
-- `PGUSER`
-- `PGPASSWORD`
-- `PGSSLMODE`
-- `PGSCHEMA`
-- `INGESTION_CRON`
-- `INGESTION_SOURCE_URL`
+  - `INGESTION_CRON`
+  - `INGESTION_SOURCE_URL`
 
 ## PostgreSQL Setup
 
@@ -87,6 +89,11 @@ npm install
 npm run migrate
 npm run dev
 ```
+
+Setup note:
+
+- `npm run migrate`, `npm run migrate:test`, `npm run test:db`, and the seed/fixture scripts only require the PostgreSQL env values.
+- `npm run dev` and `npm start` still require the full backend runtime env, including `JWT_SECRET` and `INGESTION_SOURCE_URL`.
 
 Useful backend commands:
 
@@ -177,6 +184,7 @@ How it works:
 - `npm run migrate` applies pending migrations to `PGSCHEMA`
 - `npm run migrate:down` rolls back one migration in `PGSCHEMA`
 - `npm run migrate:test` creates a disposable schema, runs the migrations, and drops the schema again
+- DB-only commands validate only PostgreSQL-related environment settings, so local schema bootstrap does not require JWT or ingestion runtime secrets
 
 Tooling note:
 

@@ -1,4 +1,4 @@
-import { env } from '../../../shared/config/env.js';
+import { appEnv } from '../../../shared/config/app-env.js';
 import { logger } from '../../../shared/utils/logger.js';
 import { auditService } from '../../audit/services/audit.service.js';
 import { ingestionRepository } from '../repositories/ingestion.repository.js';
@@ -10,7 +10,7 @@ export const ingestionService = {
       throw Object.assign(new Error('Forbidden'), { status: 403, code: 'FORBIDDEN' });
     }
 
-    const response = await fetch(env.ingestionSourceUrl);
+    const response = await fetch(appEnv.ingestionSourceUrl);
     if (!response.ok) {
       throw Object.assign(new Error(`Ingestion source error: ${response.status}`), { status: 500, code: 'INTERNAL_ERROR' });
     }
