@@ -185,6 +185,14 @@ Default frontend URL:
 
 - `http://localhost:4200`
 
+Current frontend navigation after sign-in:
+
+- `/companies`: searchable company workspace with filters, pagination, and watchlist actions
+- `/companies/new`: create company form
+- `/companies/:id`: company detail and update form
+- `/watchlist`: dedicated watchlist page
+- Analytics is still shown in the shell as an upcoming area, not a completed route
+
 ## Root Developer Workflow
 
 Install dependencies in both workspaces first:

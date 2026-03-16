@@ -33,9 +33,11 @@ describe('AuthService', () => {
 
     const request = httpTestingController.expectOne('/api/auth/login');
     request.flush({
-      accessToken: 'token-1',
-      tenantId: 'tenant-1',
-      user: { id: 'user-1', email: 'user@example.com', name: 'User One' }
+      success: true,
+      data: {
+        token: 'token-1',
+        user: { id: 'user-1', tenantId: 'tenant-1', email: 'user@example.com', fullName: 'User One', role: 'admin' }
+      }
     });
 
     expect(accessToken).toBe('token-1');
@@ -60,7 +62,7 @@ describe('AuthService', () => {
       JSON.stringify({
         accessToken: 'token-1',
         tenantId: 'tenant-1',
-        user: { id: 'user-1', email: 'user@example.com', name: 'User One' }
+        user: { id: 'user-1', email: 'user@example.com', name: 'User One', role: 'admin' }
       })
     );
     const rebuilt = new AuthService(TestBed.inject(HttpClientService));

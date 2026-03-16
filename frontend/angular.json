@@ -51,7 +51,8 @@
               "buildTarget": "ledgeraxis-frontend:build:production"
             },
             "development": {
-              "buildTarget": "ledgeraxis-frontend:build:development"
+              "buildTarget": "ledgeraxis-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

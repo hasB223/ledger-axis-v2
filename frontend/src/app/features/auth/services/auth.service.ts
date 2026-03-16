@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { HttpClientService } from '../../../core/api/http-client.service';
-import { AuthSession, LoginRequest } from '../models/auth.model';
+import { AuthApiResponse, AuthSession, LoginRequest } from '../models/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,7 +11,17 @@ export class AuthService {
   constructor(private readonly httpClient: HttpClientService) {}
 
   login(credentials: LoginRequest): Observable<AuthSession> {
-    return this.httpClient.post<LoginRequest, AuthSession>('/api/auth/login', credentials).pipe(
+    return this.httpClient.post<LoginRequest, AuthApiResponse>('/api/auth/login', credentials).pipe(
+      map((response) => ({
+        accessToken: response.token,
+        tenantId: response.user.tenantId,
+        user: {
+          id: String(response.user.id),
+          email: response.user.email,
+          name: response.user.fullName,
+          role: response.user.role
+        }
+      })),
       tap((session) => {
         this.session.set(session);
         localStorage.setItem(this.storageKey, JSON.stringify(session));
@@ -33,7 +43,8 @@ export class AuthService {
   }
 
   tenantId(): string | null {
-    return this.session()?.tenantId ?? null;
+    const tenantId = this.session()?.tenantId;
+    return tenantId == null ? null : String(tenantId);
   }
 
   private readSession(): AuthSession | null {

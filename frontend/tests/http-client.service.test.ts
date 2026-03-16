@@ -29,7 +29,7 @@ describe('HttpClientService', () => {
 
     const request = httpTestingController.expectOne('/api/companies?page=2&active=true');
     expect(request.request.method).toBe('GET');
-    request.flush({ total: 3 });
+    request.flush({ success: true, data: { total: 3 } });
 
     expect(response).toEqual({ total: 3 });
   });

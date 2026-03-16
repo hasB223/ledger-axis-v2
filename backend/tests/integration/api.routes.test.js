@@ -33,6 +33,18 @@ describe('selected API routes', () => {
     expect(res.body).toEqual({ success: true, data: { token: 'jwt', user: { id: 'u1' } } });
   });
 
+  test('login accepts local development email domains', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'admin.alpha@ledgeraxis.local', password: 'password123' });
+
+    expect(res.status).toBe(200);
+    expect(authService.login).toHaveBeenCalledWith({
+      email: 'admin.alpha@ledgeraxis.local',
+      password: 'password123'
+    });
+  });
+
   test('invalid credentials rejected safely', async () => {
     authService.login = jest.fn().mockRejectedValue(new AppError('Invalid credentials', 'UNAUTHORIZED', 401));
     const res = await request(app).post('/api/auth/login').send({ email: 'a@b.com', password: 'bad' });

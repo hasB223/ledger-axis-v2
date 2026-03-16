@@ -11,11 +11,11 @@ export class WatchlistService {
     return this.httpClient.get<WatchlistEntry[]>('/api/watchlist');
   }
 
-  add(companyId: string): Observable<WatchlistEntry> {
-    return this.httpClient.post<{ companyId: string }, WatchlistEntry>('/api/watchlist', { companyId });
+  add(companyId: string | number, note?: string): Observable<WatchlistEntry> {
+    return this.httpClient.post<{ companyId: string | number; note?: string }, WatchlistEntry>('/api/watchlist', { companyId, note });
   }
 
-  remove(companyId: string): Observable<void> {
-    return this.httpClient.delete<void>(`/api/watchlist/${companyId}`);
+  remove(entryId: string | number): Observable<void> {
+    return this.httpClient.delete<void>(`/api/watchlist/${entryId}`);
   }
 }
